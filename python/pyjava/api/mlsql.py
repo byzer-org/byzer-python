@@ -1,12 +1,14 @@
 import logging
 import os
 import socket
+from distutils.version import StrictVersion
 import uuid
 from urllib.parse import quote
 import json
 
 import pandas as pd
 import sys
+from typing import Dict
 
 import pyjava.utils as utils
 import requests
@@ -243,9 +245,18 @@ class RayContext(object):
                 context = PythonContext("", [], {"pythonMode": "ray"})
                 context.rayContext.is_in_mlsql = False
         else:
-            raise Exception("context is not set")
+            raise Exception("context is not detect. make sure it's in globals().")
 
-        if url is not None:
+        if url == "local":
+            from pyjava.rayfix import RayWrapper
+            ray = RayWrapper()
+            if ray.ray_version < StrictVersion('1.6.0'):
+                raise Exception("URL:local is only support in ray >= 1.6.0")
+            # if not ray.ray_instance.is_initialized:
+            ray.ray_instance.shutdown()
+            ray.ray_instance.init(namespace="default")
+
+        elif url is not None:
             from pyjava.rayfix import RayWrapper
             ray = RayWrapper()
             is_udf_client = context.conf.get("UDF_CLIENT")
@@ -255,12 +266,23 @@ class RayContext(object):
             if is_udf_client and url not in RayContext.conn_cache:
                 ray.init(url, **kwargs)
                 RayContext.conn_cache[url] = 1
+
         return context.rayContext
 
     def setup(self, func_for_row, func_for_rows=None):
         if self.is_setup:
             raise ValueError("setup can be only invoke once")
         self.is_setup = True
+
+        is_data_mode = "dataMode" in self.conf() and self.conf()["dataMode"] == "data"
+
+        if not is_data_mode:
+            raise Exception('''
+Please setup dataMode as data instead of model. 
+Try run: `!python conf "dataMode=data"` or 
+add comment like: `#%dataMode=data` if you are in notebook.
+            ''')
+
         import ray
         from pyjava.rayfix import RayWrapper
         rayw = RayWrapper()
