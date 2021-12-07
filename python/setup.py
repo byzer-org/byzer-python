@@ -60,7 +60,9 @@ try:
                   'pyjava.udf',
                   'pyjava.datatype',
                   'pyjava.storage',
-                  'pyjava.cache'],
+                  'pyjava.cache',
+                  'pyjava.data'
+                  ],
         include_package_data=True,
         package_dir={
             'pyjava.sbin': 'deps/sbin'

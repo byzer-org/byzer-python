@@ -6,10 +6,9 @@ import uuid
 
 import pandas as pd
 import sys
-from typing import Dict
-
 import pyjava.utils as utils
 import requests
+
 from pyjava.serializers import ArrowStreamSerializer
 from pyjava.serializers import read_int
 from pyjava.utils import utf8_deserializer
@@ -396,6 +395,11 @@ add comment like: `#%dataMode=data` if you are in notebook.
         items = [row for row in self.collect()]
         return pd.DataFrame(data=items)
 
+    def to_dataset(self):
+        from pyjava.data.datasource import KoloRawDatasource
+        source = KoloRawDatasource(self.servers)
+        return source.to_dataset()
+
     @staticmethod
     def fetch_once_as_rows(data_server):
         for df in RayContext.fetch_data_from_single_data_server(data_server):
@@ -404,6 +408,11 @@ add comment like: `#%dataMode=data` if you are in notebook.
 
     @staticmethod
     def fetch_data_from_single_data_server(data_server):
+        for table in RayContext.fetch_data_from_single_data_server_as_arrow(data_server):
+            yield table.to_pandas()
+
+    @staticmethod
+    def fetch_data_from_single_data_server_as_arrow(data_server):
         out_ser = ArrowStreamSerializer()
         import pyarrow as pa
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
@@ -412,4 +421,4 @@ add comment like: `#%dataMode=data` if you are in notebook.
             infile = os.fdopen(os.dup(sock.fileno()), "rb", buffer_size)
             result = out_ser.load_stream(infile)
             for items in result:
-                yield pa.Table.from_batches([items]).to_pandas()
+                yield pa.Table.from_batches([items])
