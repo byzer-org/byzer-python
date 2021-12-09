@@ -395,9 +395,9 @@ add comment like: `#%dataMode=data` if you are in notebook.
         items = [row for row in self.collect()]
         return pd.DataFrame(data=items)
 
-    def to_dataset(self):
+    def to_dataset(self, num_tables_per_block: int = 1):
         from pyjava.data.datasource import KoloRawDatasource
-        source = KoloRawDatasource(self.servers)
+        source = KoloRawDatasource(self.servers, num_tables_per_block)
         return source.to_dataset()
 
     @staticmethod
