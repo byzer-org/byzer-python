@@ -1,4 +1,4 @@
-## PyJava 
+## Byzer-Python 
 
 This library is an ongoing effort towards bringing the data exchanging ability 
 between Java/Scala and Python. PyJava introduces Apache Arrow as the exchanging data format,
