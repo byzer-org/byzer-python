@@ -8,7 +8,7 @@ from ray.types import ObjectRef
 from pyjava.api.mlsql import RayContext
 from ray.data import Datasource, ReadTask
 from ray.data.block import Block, BlockMetadata
-from ray.data.impl.arrow_block import ArrowRow, DelegatingArrowBlockBuilder
+from ray.data.impl.arrow_block import ArrowRow
 
 
 class KoloRawDatasource(object):
