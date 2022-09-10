@@ -138,7 +138,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.arrow</groupId>
-            <artifactId>arrow-memory</artifactId>
+            <artifactId>arrow-memory-netty</artifactId>
             <version>${arrow.version}</version>
             <exclusions>
                 <exclusion>
