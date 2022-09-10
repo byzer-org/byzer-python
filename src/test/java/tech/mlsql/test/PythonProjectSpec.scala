@@ -1,13 +1,14 @@
 package tech.mlsql.test
 
-import org.scalatest.{BeforeAndAfterAll, FunSuite}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funsuite.AnyFunSuite
 import tech.mlsql.arrow.python.runner.PythonProjectRunner
 import tech.mlsql.common.utils.path.PathFun
 
 /**
-  * 2019-08-22 WilliamZhu(allwefantasy@gmail.com)
-  */
-class PythonProjectSpec extends FunSuite
+ * 2019-08-22 WilliamZhu(allwefantasy@gmail.com)
+ */
+class PythonProjectSpec extends AnyFunSuite
   with BeforeAndAfterAll {
   test("test python project") {
     val project = getExampleProject("pyproject1")

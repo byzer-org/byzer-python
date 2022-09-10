@@ -19,12 +19,12 @@ package tech.mlsql.arrow
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, FileInputStream, OutputStream}
 import java.nio.channels.{Channels, ReadableByteChannel}
-
 import org.apache.arrow.flatbuf.MessageHeader
 import org.apache.arrow.memory.BufferAllocator
 import org.apache.arrow.vector._
 import org.apache.arrow.vector.ipc.message.{ArrowRecordBatch, IpcOption, MessageSerializer}
 import org.apache.arrow.vector.ipc.{ArrowStreamWriter, ReadChannel, WriteChannel}
+import org.apache.arrow.vector.types.MetadataVersion
 import org.apache.spark.TaskContext
 import org.apache.spark.api.java.JavaRDD
 import org.apache.spark.network.util.JavaUtils
@@ -65,8 +65,7 @@ class ArrowBatchStreamWriter(
    * End the Arrow stream, does not close output stream.
    */
   def end(): Unit = {
-    val opt = new IpcOption()
-    opt.write_legacy_ipc_format = true
+    val opt = new IpcOption(true, MetadataVersion.DEFAULT)
     ArrowStreamWriter.writeEndOfStream(writeChannel, opt)
   }
 }

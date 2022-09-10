@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>tech.mlsql</groupId>
-    <artifactId>pyjava-3.0_2.12</artifactId>
+    <artifactId>pyjava-3.3_2.12</artifactId>
     <version>0.3.0</version>
     <name>pyjava with arrow support</name>
     <url>https://github.com/allwefantasy/pyjava</url>
@@ -42,19 +42,12 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <!--        <scala.version>2.11.8</scala.version>-->
-        <!--        <scala.binary.version>2.11</scala.binary.version>-->
-        <!--        <spark.version>2.4.3</spark.version>-->
-        <!--        <spark.bigversion>2.4</spark.bigversion>-->
-        <!--        <arrow.version>0.10.0</arrow.version>-->
-
-        <scala.version>2.12.10</scala.version>
+        <scala.version>2.12.15</scala.version>
         <scala.binary.version>2.12</scala.binary.version>
-        <spark.version>3.0.0</spark.version>
-        <spark.bigversion>3.0</spark.bigversion>
-        <arrow.version>0.15.1</arrow.version>
-
-        <guava.version>16.0</guava.version>
+        <spark.version>3.3.0</spark.version>
+        <spark.bigversion>3.3</spark.bigversion>
+        <arrow.version>7.0.0</arrow.version>
+        
         <httpclient.version>4.5.3</httpclient.version>
         <scope>provided</scope>
         <hadoop-client-version>2.6.5</hadoop-client-version>
@@ -70,16 +63,11 @@
             <artifactId>common-utils_${scala.binary.version}</artifactId>
             <version>${common-utils-version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.scalactic</groupId>
-            <artifactId>scalactic_${scala.binary.version}</artifactId>
-            <version>3.0.0</version>
-            <scope>test</scope>
-        </dependency>
+        
         <dependency>
             <groupId>org.scalatest</groupId>
             <artifactId>scalatest_${scala.binary.version}</artifactId>
-            <version>3.0.0</version>
+            <version>3.2.13</version>
             <scope>test</scope>
         </dependency>
 
