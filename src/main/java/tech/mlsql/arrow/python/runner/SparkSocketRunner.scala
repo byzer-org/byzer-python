@@ -1,20 +1,19 @@
 package tech.mlsql.arrow.python.runner
 
-import java.io._
-import java.net.Socket
-import java.nio.charset.StandardCharsets
-
 import org.apache.arrow.vector.VectorSchemaRoot
 import org.apache.arrow.vector.ipc.ArrowStreamReader
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.vectorized.{ArrowColumnVector, ColumnVector, ColumnarBatch}
 import org.apache.spark.{SparkException, TaskKilledException}
+import tech.mlsql.arrow._
 import tech.mlsql.arrow.context.CommonTaskContext
-import tech.mlsql.arrow.{ArrowBatchStreamWriter, ArrowConverters, ArrowUtils, Utils}
 import tech.mlsql.common.utils.distribute.socket.server.SocketServerInExecutor
 import tech.mlsql.common.utils.log.Logging
 
+import java.io._
+import java.net.Socket
+import java.nio.charset.StandardCharsets
 import scala.collection.JavaConverters._
 
 

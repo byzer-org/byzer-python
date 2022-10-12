@@ -1,9 +1,5 @@
 package tech.mlsql.arrow.python.runner
 
-import java.io._
-import java.net._
-import java.util.concurrent.atomic.AtomicBoolean
-
 import org.apache.arrow.vector.VectorSchemaRoot
 import org.apache.arrow.vector.ipc.{ArrowStreamReader, ArrowStreamWriter}
 import org.apache.spark.sql.catalyst.InternalRow
@@ -12,6 +8,9 @@ import org.apache.spark.sql.vectorized.{ArrowColumnVector, ColumnVector, Columna
 import tech.mlsql.arrow.context.CommonTaskContext
 import tech.mlsql.arrow.{ArrowUtils, ArrowWriter, Utils}
 
+import java.io._
+import java.net._
+import java.util.concurrent.atomic.AtomicBoolean
 import scala.collection.JavaConverters._
 
 

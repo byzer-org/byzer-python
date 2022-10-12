@@ -36,6 +36,10 @@ import org.apache.spark.util.TaskCompletionListener
 import tech.mlsql.arrow.context.CommonTaskContext
 import tech.mlsql.arrow.python.iapp.{AppContextImpl, JavaContext}
 import tech.mlsql.arrow.python.ispark.SparkContextImp
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream, FileInputStream, OutputStream}
+import java.nio.channels.{Channels, ReadableByteChannel}
+
+import tech.mlsql.common.utils.lang.sc.ScalaReflect
 
 import scala.collection.JavaConverters._
 

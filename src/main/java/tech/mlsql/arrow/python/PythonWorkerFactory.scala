@@ -62,7 +62,7 @@ class PythonWorkerFactory(pythonExec: String, envVars: Map[String, String], conf
   private var lastActivityNs = 0L
 
 
-  val monitorThread = new MonitorThread()
+  private val monitorThread = new MonitorThread()
   monitorThread.setWorkerIdleTime(workerIdleTime)
   monitorThread.start()
 
@@ -174,7 +174,7 @@ class PythonWorkerFactory(pythonExec: String, envVars: Map[String, String], conf
 
       try {
         // Create and start the daemon
-        val envCommand = envVars.get(ScalaMethodMacros.str(PythonConf.PYTHON_ENV)).getOrElse("")
+        val envCommand = envVars.getOrElse(ScalaMethodMacros.str(PythonConf.PYTHON_ENV), "")
         val command = Seq("bash", "-c", envCommand + s" &&  python -m ${daemonModule}")
         val pb = new ProcessBuilder(command.asJava)
         val workerEnv = pb.environment()

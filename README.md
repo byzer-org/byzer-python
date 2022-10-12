@@ -1,4 +1,4 @@
-## PyJava 
+## Byzer-Python 
 
 This library is an ongoing effort towards bringing the data exchanging ability 
 between Java/Scala and Python. PyJava introduces Apache Arrow as the exchanging data format,
@@ -41,6 +41,38 @@ For Scala 2.12/Spark 3.0.1
     <artifactId>pyjava-3.0_2.12</artifactId>
     <version>0.3.0</version>
 </dependency>
+```
+
+For Scala 2.12/Spark 3.1.1
+
+```xml
+<dependency>
+    <groupId>tech.mlsql</groupId>
+    <artifactId>pyjava-3.0_2.12</artifactId>
+    <version>0.3.2</version>
+</dependency>
+```
+
+# Build Mannually
+
+Install Build Tool:
+
+```
+pip install mlsql_plugin_tool
+```
+
+Build for Spark 3.1.1:
+
+```
+mlsql_plugin_tool spark311
+mvn clean install -DskipTests -Pdisable-java8-doclint -Prelease-sign-artifacts
+```
+
+Build For Spark 2.4.3
+
+```
+mlsql_plugin_tool spark243
+mvn clean install -DskipTests -Pdisable-java8-doclint -Prelease-sign-artifacts
 ```
 
 

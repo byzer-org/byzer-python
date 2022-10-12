@@ -18,9 +18,12 @@ import scala.collection.JavaConverters._
  */
 class JavaAppSpec extends AnyFunSuite
   with BeforeAndAfterAll {
+
+  def condaEnv = "source /Users/allwefantasy/opt/anaconda3/bin/activate dev"
+
   test("normal java application") {
     val envs = new util.HashMap[String, String]()
-    envs.put(str(PythonConf.PYTHON_ENV), "source activate dev && export ARROW_PRE_0_15_IPC_FORMAT=1 ")
+    envs.put(str(PythonConf.PYTHON_ENV), s"${condaEnv} && export ARROW_PRE_0_15_IPC_FORMAT=1 ")
     val sourceSchema = StructType(Seq(StructField("value", StringType)))
     val batch = new ArrowPythonRunner(
       Seq(ChainedPythonFunctions(Seq(PythonFunction(
@@ -55,4 +58,5 @@ class JavaAppSpec extends AnyFunSuite
     javaConext.markComplete
     javaConext.close
   }
+  
 }

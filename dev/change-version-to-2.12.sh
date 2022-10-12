@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env bash
 
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
@@ -15,5 +15,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
 
-__version__ = "0.3.5"
+# This script exists for backwards compability. Use change-scala-version.sh instead.
+echo "This script is deprecated. Please instead run: change-scala-version.sh 2.10"
+
+$(dirname $0)/change-scala-version.sh 2.12
