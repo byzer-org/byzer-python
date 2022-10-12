@@ -7,5 +7,5 @@ target/
 python/.eggs/
 __pycache__
 spark-warehouse
-
+pyjava-3.0_2.12.iml
 *.iml

@@ -1,12 +1,12 @@
 package tech.mlsql.test
 
 import java.util
-
-import org.apache.spark.{TaskContext, WowRowEncoder}
+import org.apache.spark.TaskContext
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.catalyst.encoders.RowEncoder
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
-import org.scalatest.{BeforeAndAfterAll, FunSuite}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funsuite.AnyFunSuite
 import tech.mlsql.arrow.python.iapp.{AppContextImpl, JavaContext}
 import tech.mlsql.arrow.python.runner.{ArrowPythonRunner, ChainedPythonFunctions, PythonConf, PythonFunction}
 import tech.mlsql.common.utils.lang.sc.ScalaMethodMacros.str
@@ -16,7 +16,7 @@ import scala.collection.JavaConverters._
 /**
  * 2019-08-15 WilliamZhu(allwefantasy@gmail.com)
  */
-class JavaAppSpec extends FunSuite
+class JavaAppSpec extends AnyFunSuite
   with BeforeAndAfterAll {
 
   def condaEnv = "source /Users/allwefantasy/opt/anaconda3/bin/activate dev"
@@ -42,9 +42,10 @@ class JavaAppSpec extends FunSuite
     )
 
 
-    val sourceEnconder  = WowRowEncoder.fromRow(sourceSchema) //RowEncoder.apply(sourceSchema).resolveAndBind()
+    val sourceEnconder = RowEncoder.apply(sourceSchema).resolveAndBind()
+    val toRow = sourceEnconder.createSerializer()
     val newIter = Seq(Row.fromSeq(Seq("a1")), Row.fromSeq(Seq("a2"))).map { irow =>
-      sourceEnconder(irow).copy()
+      toRow(irow).copy()
     }.iterator
 
     val javaConext = new JavaContext
