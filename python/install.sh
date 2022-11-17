@@ -1,5 +1,5 @@
 project=pyjava
-version=0.3.5
+version=0.3.6
 rm -rf ./dist/*
 pip uninstall -y ${project}
 python setup.py sdist bdist_wheel
