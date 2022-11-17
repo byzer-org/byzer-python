@@ -332,6 +332,10 @@ add comment like: `#%dataMode=data` if you are in notebook.
     def build_result(self, items, block_size=1024):
         self.python_context.build_result(items, block_size)
 
+    def build_result_from_dataframe(self, df):
+        rows = (row for row in df.to_dict('records'))
+        self.python_context.build_result(rows)
+
     def build_result_from_dir(self, target_path):
         self.python_context.build_result_from_dir(target_path)
 
