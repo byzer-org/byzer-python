@@ -130,11 +130,16 @@ class PythonWorkerFactory(pythonExec: String, envVars: Map[String, String], conf
     try {
       serverSocket = new ServerSocket(0, 1, InetAddress.getByAddress(Array(127, 0, 0, 1)))
 
+      val envCommand = envVars.getOrElse(ScalaMethodMacros.str(PythonConf.PYTHON_ENV), "")
+      val command = Seq(pythonExec, "-m", workerModule)
+
       // Create and start the worker
-      val pb = new ProcessBuilder(Arrays.asList(pythonExec, "-m", workerModule))
+      val pb = new ProcessBuilder(command.asJava)
       val workerEnv = pb.environment()
       workerEnv.putAll(envVars.asJava)
       workerEnv.put("PYTHONPATH", pythonPath)
+      workerEnv.put("PYTHONUTF8", "1")
+      workerEnv.put("PYTHONIOENCODING", "utf-8")
       // This is equivalent to setting the -u flag; we use it because ipython doesn't support -u:
       workerEnv.put("PYTHONUNBUFFERED", "YES")
       workerEnv.put("PYTHON_WORKER_FACTORY_PORT", serverSocket.getLocalPort.toString)

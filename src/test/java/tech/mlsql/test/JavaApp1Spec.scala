@@ -1,11 +1,11 @@
 package tech.mlsql.test
 
 import java.util
-
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.{ArrayType, DoubleType, StructField, StructType}
 import org.apache.spark.{TaskContext, WowRowEncoder}
-import org.scalatest.{BeforeAndAfterAll, FunSuite}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.BeforeAndAfterAll
 import tech.mlsql.arrow.python.iapp.{AppContextImpl, JavaContext}
 import tech.mlsql.arrow.python.runner.{ArrowPythonRunner, ChainedPythonFunctions, PythonConf, PythonFunction}
 import tech.mlsql.common.utils.lang.sc.ScalaMethodMacros.str
@@ -15,7 +15,7 @@ import scala.collection.JavaConverters._
 /**
  * 2019-08-15 WilliamZhu(allwefantasy@gmail.com)
  */
-class JavaApp1Spec extends FunSuite
+class JavaApp1Spec extends AnyFunSuite
   with BeforeAndAfterAll {
 
   def condaEnv = "source /Users/allwefantasy/opt/anaconda3/bin/activate ray-dev"

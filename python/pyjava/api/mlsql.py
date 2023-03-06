@@ -423,7 +423,7 @@ add comment like: `#%dataMode=data` if you are in notebook.
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.connect((data_server.host, data_server.port))
             buffer_size = int(os.environ.get("BUFFER_SIZE", 65536))
-            infile = os.fdopen(os.dup(sock.fileno()), "rb", buffer_size)
+            infile = sock.makefile("rb", buffer_size)  # os.fdopen(os.dup(sock.fileno()), "rb", buffer_size)
             result = out_ser.load_stream(infile)
             for items in result:
                 yield pa.Table.from_batches([items])
