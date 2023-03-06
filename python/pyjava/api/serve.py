@@ -13,8 +13,6 @@ from pyjava.serializers import \
     write_int, read_int, \
     SpecialLengths, ArrowStreamPandasSerializer
 
-os.environ["ARROW_PRE_0_15_IPC_FORMAT"] = "1"
-
 
 class SocketNotBindException(Exception):
     def __init__(self, message):

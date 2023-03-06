@@ -17,6 +17,8 @@
 
 import types
 from functools import wraps
+from pyjava.api.mlsql import RayContext, PythonContext
+from pyjava.storage import streaming_tar
 
 
 def since(version):
@@ -69,3 +71,6 @@ def keyword_only(func):
         return func(self, **kwargs)
 
     return wrapper
+
+
+__all__ = ['RayContext', 'PythonContext', 'streaming_tar', 'context']
