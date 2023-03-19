@@ -130,9 +130,9 @@ class RayDataServer(object):
     def close(self):
         try:
             self.server.close()
-            ray.actor.exit_actor()
         except Exception:
             print(traceback.format_exc())
+        ray.actor.exit_actor()
 
     def connect_info(self):
         return DataServerWithId(self.host, self.port, self.server_id)
