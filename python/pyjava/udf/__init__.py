@@ -108,7 +108,7 @@ class UDFBuilder(object):
         try:
             res = ray.get(worker.apply.remote(input_value))
         except Exception as inst:
-            res = []
+            res = {}
             print(inst)
         udf_master.give_back.remote(index)
         ray_context.build_result([res])
