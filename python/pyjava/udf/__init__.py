@@ -13,27 +13,29 @@ class UDFMaster(object):
     def __init__(self, num: int, conf: Dict[str, str],
                  init_func: Callable[[List[ClientObjectRef], Dict[str, str]], Any],
                  apply_func: Callable[[Any, Any], Any]):
-        model_servers = RayContext.parse_servers(conf["modelServers"])
-        items = RayContext.collect_from(model_servers)
-        model_refs = [ray.put(item) for item in items]
-
-        udfWorkerConf = {}
+        udf_worker_conf = {}
 
         if "num_cpus" in conf:
-            udfWorkerConf["num_cpus"] = int(conf["num_cpus"])
+            udf_worker_conf["num_cpus"] = int(conf["num_cpus"])
 
         if "num_gpus" in conf:
-            udfWorkerConf["num_gpus"] = int(conf["num_gpus"])
+            udf_worker_conf["num_gpus"] = int(conf["num_gpus"])
 
         custom_resources = [(key.split("resource.")[1], float(conf[key])) for key in
                             conf.keys() if
                             key.startswith("resource.")]
 
         if len(custom_resources) > 0:
-            udfWorkerConf["resources"] = dict(custom_resources)
+            udf_worker_conf["resources"] = dict(custom_resources)
+
+        model_refs = []
+        if "modelServers" in conf:
+            model_servers = RayContext.parse_servers(conf["modelServers"])
+            items = RayContext.collect_from(model_servers)
+            model_refs = [ray.put(item) for item in items]
 
         self.actors = dict(
-            [(index, UDFWorker.options(**udfWorkerConf).remote(model_refs, conf, init_func, apply_func)) for index in range(num)])
+            [(index, UDFWorker.options(**udf_worker_conf).remote(model_refs, conf, init_func, apply_func)) for index in range(num)])
         self._idle_actors = [index for index in range(num)]
 
     def get(self) -> List[Any]:
