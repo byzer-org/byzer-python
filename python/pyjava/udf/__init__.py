@@ -34,12 +34,10 @@ class UDFMaster(object):
             items = RayContext.collect_from(model_servers)
             model_refs = [ray.put(item) for item in items]
 
-        actor_creation_timeout = int(conf.get("actorCreationTimeout", 300))
-
         self.actors = dict(
             [(index,
-              UDFWorker.options(timeout=actor_creation_timeout, **udf_worker_conf).remote(model_refs, conf, init_func,
-                                                                                          apply_func)) for index in
+              UDFWorker.options(**udf_worker_conf).remote(model_refs, conf, init_func,
+                                                          apply_func)) for index in
              range(num)])
         self._idle_actors = [index for index in range(num)]
 
@@ -81,7 +79,6 @@ class UDFBuilder(object):
         conf = ray_context.conf()
         udf_name = conf["UDF_CLIENT"]
         max_concurrency = int(conf.get("maxConcurrency", "3"))
-        actor_creation_timeout = int(conf.get("actorCreationTimeout", 300))
 
         try:
             stop_flag = True
@@ -100,7 +97,7 @@ class UDFBuilder(object):
             print(inst)
             pass
 
-        UDFMaster.options(name=udf_name, timeout=actor_creation_timeout, lifetime="detached",
+        UDFMaster.options(name=udf_name, lifetime="detached",
                           max_concurrency=max_concurrency).remote(
             max_concurrency, conf, init_func, apply_func)
         ray_context.build_result([])
