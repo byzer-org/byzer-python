@@ -27,12 +27,18 @@ class UDFMaster(object):
 
         if len(custom_resources) > 0:
             udf_worker_conf["resources"] = dict(custom_resources)
-
+        
+        standalone = bool(conf.get("standalone", "false"))
+        
         model_refs = []
-        if "modelServers" in conf:
-            model_servers = RayContext.parse_servers(conf["modelServers"])
-            items = RayContext.collect_from(model_servers)
-            model_refs = [ray.put(item) for item in items]
+
+        if "modelServers" in conf and not standalone:
+                model_servers = RayContext.parse_servers(conf["modelServers"])
+                print(f"Pull model from {model_servers[0].host}:{model_servers[0].port}")
+                items = RayContext.collect_from(model_servers)
+                model_refs = [ray.put(item) for item in items]
+                print(f"Success to pull model. The total: {len(model_refs)}")    
+            
 
         self.actors = dict(
             [(index,
@@ -61,7 +67,9 @@ class UDFWorker(object):
                  conf: Dict[str, str],
                  init_func: Callable[[List[ClientObjectRef], Dict[str, str]], Any],
                  apply_func: Callable[[Any, Any], Any]):
+        print("init model....")
         self.model = init_func(model_refs, conf)
+        print("success to init model")
         self.apply_func = apply_func
 
     def apply(self, v: Any) -> Any:
