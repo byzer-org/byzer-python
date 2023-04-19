@@ -1,7 +1,7 @@
 import uuid
+import time
 from typing import Any, NoReturn, Callable, Dict, List
 import ray
-import time
 from ray.util.client.common import ClientActorHandle, ClientObjectRef
 
 from pyjava.api.mlsql import RayContext
@@ -27,17 +27,19 @@ class UDFMaster(object):
 
         if len(custom_resources) > 0:
             udf_worker_conf["resources"] = dict(custom_resources)
-        
-        standalone = bool(conf.get("standalone", "false"))
+                
+        standalone = conf.get("standalone", "false") == "true"
         
         model_refs = []
-
+        print(f"standalone: {standalone} modelServers: {'modelServers' in conf}") 
         if "modelServers" in conf and not standalone:
-                model_servers = RayContext.parse_servers(conf["modelServers"])
-                print(f"Pull model from {model_servers[0].host}:{model_servers[0].port}")
-                items = RayContext.collect_from(model_servers)
-                model_refs = [ray.put(item) for item in items]
-                print(f"Success to pull model. The total: {len(model_refs)}")    
+            model_servers = RayContext.parse_servers(conf["modelServers"])
+            print(f"Pull model from {model_servers[0].host}:{model_servers[0].port}")
+            time1 = time.time()
+            items = RayContext.collect_from(model_servers)
+            model_refs = [ray.put(item) for item in items]
+            time2 = time.time()
+            print(f"Success to pull model, time taken:{time2-time1}s. The total refs: {len(model_refs)}")    
             
 
         self.actors = dict(
