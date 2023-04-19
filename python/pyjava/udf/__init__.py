@@ -69,9 +69,11 @@ class UDFWorker(object):
                  conf: Dict[str, str],
                  init_func: Callable[[List[ClientObjectRef], Dict[str, str]], Any],
                  apply_func: Callable[[Any, Any], Any]):
-        print("init model....")
+        print("Init model....")
+        time1 = time.time()
         self.model = init_func(model_refs, conf)
-        print("success to init model")
+        time2 = time.time()
+        print(f"Success to init model. Time taken: {time2 - time1}s")
         self.apply_func = apply_func
 
     def apply(self, v: Any) -> Any:
