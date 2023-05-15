@@ -108,7 +108,7 @@ class UDFBuilder(object):
         except Exception as inst:
             print(inst)
             pass
-
+                
         UDFMaster.options(name=udf_name, lifetime="detached",
                           max_concurrency=max_concurrency).remote(
             max_concurrency, conf, init_func, apply_func)
