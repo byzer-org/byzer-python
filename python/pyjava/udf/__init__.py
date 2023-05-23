@@ -6,13 +6,14 @@ from ray.util.client.common import ClientActorHandle, ClientObjectRef
 
 from pyjava.api.mlsql import RayContext
 from pyjava.storage import streaming_tar
-
+import threading
 
 @ray.remote
 class UDFMaster(object):
     def __init__(self, num: int, conf: Dict[str, str],
                  init_func: Callable[[List[ClientObjectRef], Dict[str, str]], Any],
                  apply_func: Callable[[Any, Any], Any]):
+        self.lock = threading.Lock()         
         udf_worker_conf = {}
 
         if "num_cpus" in conf:
@@ -50,13 +51,15 @@ class UDFMaster(object):
         self._idle_actors = [index for index in range(num)]
 
     def get(self) -> List[Any]:
-        while len(self._idle_actors) == 0:
-            time.sleep(0.001)
-        index = self._idle_actors.pop()
-        return [index, self.actors[index]]
+        with self.lock:
+            while len(self._idle_actors) == 0:
+                time.sleep(0.001)
+            index = self._idle_actors.pop()        
+            return [index, self.actors[index]]
 
     def give_back(self, v) -> NoReturn:
-        self._idle_actors.append(v)
+        with self.lock:
+            self._idle_actors.append(v)
 
     def shutdown(self) -> NoReturn:
         [ray.kill(self.actors[index]) for index in self._idle_actors]
