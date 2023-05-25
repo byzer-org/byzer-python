@@ -51,11 +51,11 @@ class UDFMaster(object):
         self._idle_actors = [index for index in range(num)]
 
     def get(self) -> List[Any]:
-        with self.lock:
-            while len(self._idle_actors) == 0:
+        while len(self._idle_actors) == 0:
                 time.sleep(0.001)
+        with self.lock:            
             index = self._idle_actors.pop()        
-            return [index, self.actors[index]]
+        return [index, self.actors[index]]
 
     def give_back(self, v) -> NoReturn:
         with self.lock:
@@ -94,6 +94,7 @@ class UDFBuilder(object):
         conf = ray_context.conf()
         udf_name = conf["UDF_CLIENT"]
         max_concurrency = int(conf.get("maxConcurrency", "3"))
+        masterMaxConcurrency = int(conf.get("masterMaxConcurrency", "100"))
 
         try:
             stop_flag = True
@@ -113,7 +114,7 @@ class UDFBuilder(object):
             pass
                 
         UDFMaster.options(name=udf_name, lifetime="detached",
-                          max_concurrency=max_concurrency).remote(
+                          max_concurrency=masterMaxConcurrency).remote(
             max_concurrency, conf, init_func, apply_func)
         ray_context.build_result([])
 
