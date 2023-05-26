@@ -94,7 +94,7 @@ class UDFBuilder(object):
         conf = ray_context.conf()
         udf_name = conf["UDF_CLIENT"]
         max_concurrency = int(conf.get("maxConcurrency", "3"))
-        masterMaxConcurrency = int(conf.get("masterMaxConcurrency", "100000"))
+        masterMaxConcurrency = int(conf.get("masterMaxConcurrency", "1000"))
 
         try:
             stop_flag = True
