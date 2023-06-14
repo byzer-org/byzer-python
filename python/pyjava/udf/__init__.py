@@ -32,15 +32,20 @@ class UDFMaster(object):
         standalone = conf.get("standalone", "false") == "true"
         
         model_refs = []
-        print(f"standalone: {standalone} modelServers: {'modelServers' in conf}") 
+
+        udf_name  = conf["UDF_CLIENT"] if "UDF_CLIENT" in conf else "UNKNOW MODEL"
+                
         if "modelServers" in conf and not standalone:
-            model_servers = RayContext.parse_servers(conf["modelServers"])
-            print(f"Pull model from {model_servers[0].host}:{model_servers[0].port}")
+            model_servers = RayContext.parse_servers(conf["modelServers"])  
+            print(f"MODEL[{udf_name}] Transfer model from {model_servers[0].host}:{model_servers[0].port} to Ray Object Store")                       
             time1 = time.time()
-            items = RayContext.collect_from(model_servers)
-            model_refs = [ray.put(item) for item in items]
+            items = RayContext.collect_from(model_servers)            
+            for item in items:
+                if len(model_refs) % 1000:
+                    print(f"MODEL[{udf_name}] Transfer model from {model_servers[0].host}:{model_servers[0].port} to Ray Object Store, current count: {len(model_refs)}")
+                model_refs.append(ray.put(item))            
             time2 = time.time()
-            print(f"Success to pull model, time taken:{time2-time1}s. The total refs: {len(model_refs)}")    
+            print(f"MODEL[{udf_name}] Successful to put the model in Ray, time taken:{time2-time1}s. The total refs: {len(model_refs)}")    
             
 
         self.actors = dict(
@@ -72,11 +77,11 @@ class UDFWorker(object):
                  conf: Dict[str, str],
                  init_func: Callable[[List[ClientObjectRef], Dict[str, str]], Any],
                  apply_func: Callable[[Any, Any], Any]):
-        print("Init model....")
+        print("Transfer model from Ray Object Store to local and load from local. It make take a while.")
         time1 = time.time()
         self.model = init_func(model_refs, conf)
         time2 = time.time()
-        print(f"Success to init model. Time taken: {time2 - time1}s")
+        print(f"Successful to load the model, time taken:{time2-time1}s")
         self.apply_func = apply_func
 
     def apply(self, v: Any) -> Any:
