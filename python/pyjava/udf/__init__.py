@@ -77,11 +77,14 @@ class UDFWorker(object):
                  conf: Dict[str, str],
                  init_func: Callable[[List[ClientObjectRef], Dict[str, str]], Any],
                  apply_func: Callable[[Any, Any], Any]):
-        print("Transfer model from Ray Object Store to local and load from local. It make take a while.")
+        
+        udf_name  = conf["UDF_CLIENT"] if "UDF_CLIENT" in conf else "UNKNOW MODEL"
+
+        print(f"MODEL[{udf_name}] Init Model,It make take a while.")
         time1 = time.time()
         self.model = init_func(model_refs, conf)
         time2 = time.time()
-        print(f"Successful to load the model, time taken:{time2-time1}s")
+        print(f"MODEL[{udf_name}] Successful to init model, time taken:{time2-time1}s")
         self.apply_func = apply_func
 
     def apply(self, v: Any) -> Any:
