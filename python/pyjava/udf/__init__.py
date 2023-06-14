@@ -41,7 +41,7 @@ class UDFMaster(object):
             time1 = time.time()
             items = RayContext.collect_from(model_servers)            
             for item in items:
-                if len(model_refs) % 5000:
+                if len(model_refs) % 5000 == 0:
                     print(f"MODEL[{udf_name}] Transfer model from {model_servers[0].host}:{model_servers[0].port} to Ray Object Store, current count: {len(model_refs)}")
                 model_refs.append(ray.put(item))            
             time2 = time.time()
