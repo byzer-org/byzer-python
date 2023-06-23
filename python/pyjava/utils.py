@@ -116,3 +116,6 @@ def local_connect_and_auth(port):
             sock.close()
             sock = None
     raise Exception("could not open socket: %s" % errors)
+
+def print_flush(*args, **kwargs):
+    print(*args, **kwargs, flush=True)

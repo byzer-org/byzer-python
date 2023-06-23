@@ -7,6 +7,7 @@ from ray.util.client.common import ClientActorHandle, ClientObjectRef
 from pyjava.api.mlsql import RayContext
 from pyjava.storage import streaming_tar
 import threading
+from ..utils import print_flush
 
 @ray.remote
 class UDFMaster(object):
@@ -14,6 +15,14 @@ class UDFMaster(object):
                  init_func: Callable[[List[ClientObjectRef], Dict[str, str]], Any],
                  apply_func: Callable[[Any, Any], Any]):
         self.lock = threading.Lock()         
+        self.num = num
+        self.conf = conf
+        self.init_func = init_func
+        self.apply_func = apply_func
+        self.actors = {}
+        self._idle_actors = []
+
+    def create_workers(self, conf):
         udf_worker_conf = {}
 
         if "num_cpus" in conf:
@@ -28,32 +37,30 @@ class UDFMaster(object):
 
         if len(custom_resources) > 0:
             udf_worker_conf["resources"] = dict(custom_resources)
-                
-        standalone = conf.get("standalone", "false") == "true"
-        
-        model_refs = []
 
         udf_name  = conf["UDF_CLIENT"] if "UDF_CLIENT" in conf else "UNKNOW MODEL"
-                
+        standalone = conf.get("standalone", "false") == "true"
+        model_refs = []
         if "modelServers" in conf and not standalone:
             model_servers = RayContext.parse_servers(conf["modelServers"])  
-            print(f"MODEL[{udf_name}] Transfer model from {model_servers[0].host}:{model_servers[0].port} to Ray Object Store")                       
-            time1 = time.time()
-            items = RayContext.collect_from(model_servers)            
-            for item in items:
-                if len(model_refs) % 5000 == 0:
-                    print(f"MODEL[{udf_name}] Transfer model from {model_servers[0].host}:{model_servers[0].port} to Ray Object Store, current count: {len(model_refs)}")
+            print_flush(f"MODEL[{udf_name}] Transfer model from {model_servers[0].host}:{model_servers[0].port} to Ray Object Store")                       
+            time1 = time.time()            
+            count = 0           
+            for item in RayContext.collect_from(model_servers):
+                if count % 1000 == 0:
+                    print_flush(f"MODEL[{udf_name}] , current count: {count}")
+                count += 1    
                 model_refs.append(ray.put(item))            
             time2 = time.time()
-            print(f"MODEL[{udf_name}] Successful to put the model in Ray, time taken:{time2-time1}s. The total refs: {len(model_refs)}")    
-            
-
+            print_flush(f"MODEL[{udf_name}] Successful to put the model in Ray, time taken:{time2-time1}s. The total refs: {count}") 
+        
         self.actors = dict(
             [(index,
-              UDFWorker.options(**udf_worker_conf).remote(model_refs, conf, init_func,
-                                                          apply_func)) for index in
-             range(num)])
-        self._idle_actors = [index for index in range(num)]
+              UDFWorker.options(**udf_worker_conf).remote(model_refs, conf, self.init_func,
+                                                          self.apply_func)) for index in
+             range(self.num)])
+        self._idle_actors = [index for index in range(self.num)]   
+
 
     def get(self) -> List[Any]:
         while len(self._idle_actors) == 0:
@@ -80,11 +87,11 @@ class UDFWorker(object):
         
         udf_name  = conf["UDF_CLIENT"] if "UDF_CLIENT" in conf else "UNKNOW MODEL"
 
-        print(f"MODEL[{udf_name}] Init Model,It make take a while.")
+        print_flush(f"MODEL[{udf_name}] Init Model,It may take a while.")
         time1 = time.time()
         self.model = init_func(model_refs, conf)
         time2 = time.time()
-        print(f"MODEL[{udf_name}] Successful to init model, time taken:{time2-time1}s")
+        print_flush(f"MODEL[{udf_name}] Successful to init model, time taken:{time2-time1}s")
         self.apply_func = apply_func
 
     def apply(self, v: Any) -> Any:
@@ -124,6 +131,9 @@ class UDFBuilder(object):
         UDFMaster.options(name=udf_name, lifetime="detached",
                           max_concurrency=masterMaxConcurrency).remote(
             max_concurrency, conf, init_func, apply_func)
+        
+        temp_udf_master = ray.get_actor(udf_name)
+        ray.get(temp_udf_master.create_workers.remote(conf))
         ray_context.build_result([])
 
     @staticmethod
