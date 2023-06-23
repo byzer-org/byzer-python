@@ -1,8 +1,8 @@
 project=pyjava
-version=0.6.1
+version=0.6.2
 rm -rf ./dist/*
 pip uninstall -y ${project}
 python setup.py sdist bdist_wheel
 cd ./dist/
 pip install ${project}-${version}-py3-none-any.whl && cd -
-# twine upload dist/*
+twine upload dist/*
