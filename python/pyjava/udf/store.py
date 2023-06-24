@@ -14,7 +14,7 @@ async def worker(queue,udf_name,model_refs):
             # Signal to exit when queue is empty
             break
         if count % 1000 == 0:
-            print_flush(f"MODEL[{udf_name}] to ray object store: {count}")
+            print_flush(f"MODEL[{udf_name}] UDFMaster push model: {count}")
         count += 1  
         model_refs.append(ray.put(item))
 
@@ -33,7 +33,7 @@ async def _transfer_to_ob(udf_name, conf,model_refs):
     worker_task = asyncio.create_task(worker(queue,udf_name,model_refs))
     producer_task = asyncio.create_task(producer(RayContext.collect_from(model_servers), udf_name,queue))    
     await asyncio.gather(producer_task,worker_task)
-    print_flush(f"MODEL[{udf_name}] Transfer model to object store cost {time.time() - time1} seconds") 
+    print_flush(f"MODEL[{udf_name}] UDFMaster push model to object store cost {time.time() - time1} seconds") 
 
 def transfer_to_ob(udf_name, conf,model_refs):
     asyncio.run(_transfer_to_ob(udf_name, conf,model_refs))
