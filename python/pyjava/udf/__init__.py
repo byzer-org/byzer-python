@@ -42,17 +42,8 @@ class UDFMaster(object):
         standalone = conf.get("standalone", "false") == "true"
         model_refs = []
         if "modelServers" in conf and not standalone:
-            model_servers = RayContext.parse_servers(conf["modelServers"])  
-            print_flush(f"MODEL[{udf_name}] Transfer model from {model_servers[0].host}:{model_servers[0].port} to Ray Object Store")                       
-            time1 = time.time()            
-            count = 0           
-            for item in RayContext.collect_from(model_servers):
-                if count % 1000 == 0:
-                    print_flush(f"MODEL[{udf_name}] , current count: {count}")
-                count += 1    
-                model_refs.append(ray.put(item))            
-            time2 = time.time()
-            print_flush(f"MODEL[{udf_name}] Successful to put the model in Ray, time taken:{time2-time1}s. The total refs: {count}") 
+            from .store import transfer_to_ob
+            transfer_to_ob(udf_name, conf,model_refs)
         
         self.actors = dict(
             [(index,
