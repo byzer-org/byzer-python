@@ -21,7 +21,10 @@ class UDFMaster(object):
         self.apply_func = apply_func
         self.actors = {}
         self._idle_actors = []
-
+    
+    def workers(self):
+        return self.actors.values()
+    
     def create_workers(self, conf):
         udf_worker_conf = {}
 
@@ -75,17 +78,27 @@ class UDFWorker(object):
                  conf: Dict[str, str],
                  init_func: Callable[[List[ClientObjectRef], Dict[str, str]], Any],
                  apply_func: Callable[[Any, Any], Any]):
+        self.model_refs = model_refs
+        self.conf = conf
+        self.init_func = init_func
+        self.apply_func = apply_func
+        self.ready = False
         
-        udf_name  = conf["UDF_CLIENT"] if "UDF_CLIENT" in conf else "UNKNOW MODEL"
 
+    def build_model(self):        
+        udf_name  = self.conf["UDF_CLIENT"] if "UDF_CLIENT" in self.conf else "UNKNOW MODEL"
         print_flush(f"MODEL[{udf_name}] Init Model,It may take a while.")
         time1 = time.time()
-        self.model = init_func(model_refs, conf)
+        self.model = self.init_func(self.model_refs, self.conf)
         time2 = time.time()
-        print_flush(f"MODEL[{udf_name}] Successful to init model, time taken:{time2-time1}s")
-        self.apply_func = apply_func
+        print_flush(f"MODEL[{udf_name}] Successful to init model, time taken:{time2-time1}s") 
+        self.ready = True 
+        self.model_refs = None      
 
     def apply(self, v: Any) -> Any:
+        if not self.ready:
+            udf_name  = self.conf["UDF_CLIENT"] if "UDF_CLIENT" in self.conf else "UNKNOW MODEL"
+            raise Exception(f"[{udf_name}] UDFWorker is not ready")
         return self.apply_func(self.model, v)
 
     def shutdown(self):
@@ -124,7 +137,12 @@ class UDFBuilder(object):
             max_concurrency, conf, init_func, apply_func)
         
         temp_udf_master = ray.get_actor(udf_name)
+        # init workers
         ray.get(temp_udf_master.create_workers.remote(conf))
+        
+        # build model in every worker
+        build_model_jobs = [worker.build_model.remote() for worker in ray.get(temp_udf_master.workers.remote())]
+        ray.get(build_model_jobs)        
         ray_context.build_result([])
 
     @staticmethod
