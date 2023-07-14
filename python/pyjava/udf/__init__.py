@@ -31,7 +31,7 @@ class UDFMaster(object):
         if "num_cpus" in conf:
             udf_worker_conf["num_cpus"] = float(conf["num_cpus"])
 
-        if "num_gpus" in conf and conf.get("infer_bakend", "transformers") != "transformers":
+        if "num_gpus" in conf and conf.get("infer_bakend", "transformers") == "transformers":
             udf_worker_conf["num_gpus"] = float(conf["num_gpus"])
 
         custom_resources = [(key.split("resource.")[1], float(conf[key])) for key in
