@@ -245,6 +245,14 @@ class RayContext(object):
                 context.rayContext.is_in_mlsql = False
         else:
             raise Exception("context is not detect. make sure it's in globals().")
+        
+        # to speed up connect to ray. if we use ray client server,
+        # it may slow and not stable.
+        if url == "worker":
+            from pyjava.rayfix import RayWrapper
+            ray = RayWrapper()               
+            ray.ray_instance.init(address="auto",ignore_reinit_error=True,namespace="default")
+            return context.rayContext
 
         if url == "local":
             from pyjava.rayfix import RayWrapper
@@ -253,8 +261,7 @@ class RayContext(object):
                 raise Exception("URL:local is only support in ray >= 1.6.0")
             # if not ray.ray_instance.is_initialized:
             ray.ray_instance.shutdown()
-            ray.ray_instance.init(namespace="default")
-
+            ray.ray_instance.init(namespace="default")        
         elif url is not None:
             from pyjava.rayfix import RayWrapper
             ray = RayWrapper()
