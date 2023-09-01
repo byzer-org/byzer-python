@@ -32,8 +32,16 @@ class UDFMaster(object):
             udf_worker_conf["num_cpus"] = float(conf["num_cpus"])
 
         infer_backend =  conf.get("infer_backend", "transformers")
+        
         if "num_gpus" in conf and not infer_backend.startswith("ray/"):
             udf_worker_conf["num_gpus"] = float(conf["num_gpus"])
+        
+        if infer_backend.startswith("ray/vllm"):
+            env_vars = {
+                        "RAY_EXPERIMENTAL_NOSET_CUDA_VISIBLE_DEVICES":"true"                    
+                        }                                        
+            runtime_env = {"env_vars": env_vars}
+            udf_worker_conf["runtime_env"] = runtime_env
 
         custom_resources = [(key.split("resource.")[1], float(conf[key])) for key in
                             conf.keys() if
