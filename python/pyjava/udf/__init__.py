@@ -53,6 +53,9 @@ class UDFMaster(object):
             runtime_env = {"env_vars": env_vars}
             udf_worker_conf["runtime_env"] = runtime_env
 
+        if infer_backend.startswith("ray/deepspeed"):    
+            udf_worker_conf["num_gpus"] = float(conf["num_gpus"])
+
         custom_resources = [(key.split("resource.")[1], float(conf[key])) for key in
                             conf.keys() if
                             key.startswith("resource.")]
