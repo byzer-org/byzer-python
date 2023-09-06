@@ -11,6 +11,16 @@ from ..utils import print_flush
 
 @ray.remote
 class UDFMaster(object):
+    '''
+      UDFMaster is a actor which manage UDFWorkers. 
+
+      num: the number of UDFWorkers
+      conf: the configuration setup by !byzerllm
+      init_func: init_model in byzer-llm package
+      apply_func: stream_chat in byzer-llm package.
+
+      init_func/apply_func will deliver to UDFWorker. 
+    '''
     def __init__(self, num: int, conf: Dict[str, str],
                  init_func: Callable[[List[ClientObjectRef], Dict[str, str]], Any],
                  apply_func: Callable[[Any, Any], Any]):
@@ -36,7 +46,7 @@ class UDFMaster(object):
         if "num_gpus" in conf and not infer_backend.startswith("ray/"):
             udf_worker_conf["num_gpus"] = float(conf["num_gpus"])
         
-        if infer_backend.startswith("ray/vllm"):
+        if infer_backend.startswith("ray/vllm"):            
             env_vars = {
                         "RAY_EXPERIMENTAL_NOSET_CUDA_VISIBLE_DEVICES":"true"                    
                         }                                        
@@ -66,6 +76,9 @@ class UDFMaster(object):
 
 
     def get(self) -> List[Any]:
+        '''
+          get a idle UDFWorker to process inference
+        '''
         while len(self._idle_actors) == 0:
                 time.sleep(0.001)
         with self.lock:            
@@ -73,6 +86,9 @@ class UDFMaster(object):
         return [index, self.actors[index]]
 
     def give_back(self, v) -> NoReturn:
+        '''
+          give back a idle UDFWorker
+        '''
         with self.lock:
             self._idle_actors.append(v)
 
