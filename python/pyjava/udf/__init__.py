@@ -80,7 +80,7 @@ class UDFMaster(object):
         
         self.actors = dict(
             [(index,
-              UDFWorker.options(max_concurrency=workerMaxConcurrency, **udf_worker_conf).remote(model_refs, conf, self.init_func,
+              UDFWorker.options(**udf_worker_conf).remote(model_refs, conf, self.init_func,
                                                           self.apply_func)) for index in
              range(self.num)])
         self.actor_indices = [index for index in range(self.num)]
@@ -100,7 +100,13 @@ class UDFMaster(object):
                 if self.actor_index_concurrency[index] > 0:
                     self.actor_index_concurrency[index] = self.actor_index_concurrency[index] - 1
                     return [index, self.actors[index]]
-        raise Exception("No idle UDFWorker")        
+        raise Exception("No idle UDFWorker")   
+
+    async def async_get(self) -> List[Any]:
+        pass
+
+    async def async_give_back(self,index)->NoReturn:
+        pass     
 
 
     def give_back(self, index) -> NoReturn:
@@ -143,6 +149,13 @@ class UDFWorker(object):
             udf_name  = self.conf["UDF_CLIENT"] if "UDF_CLIENT" in self.conf else "UNKNOW MODEL"
             raise Exception(f"[{udf_name}] UDFWorker is not ready")
         return self.apply_func(self.model, v)
+    
+    async def async_apply(self,v:Any) -> Any:
+        if not self.ready:
+            udf_name  = self.conf["UDF_CLIENT"] if "UDF_CLIENT" in self.conf else "UNKNOW MODEL"
+            raise Exception(f"[{udf_name}] UDFWorker is not ready")
+        resp = await self.apply_func(self.model, v)
+        return resp
 
     def shutdown(self):
         ray.actor.exit_actor()
@@ -223,7 +236,7 @@ class UDFBuilder(object):
         
         task3 = asyncio.to_thread(get_result,udf_master,index,worker,input_value)
         res = await task3
-        return res
+        ray_context.build_result([res])
 
     @staticmethod
     def block_apply(ray_context: RayContext):
@@ -242,23 +255,10 @@ class UDFBuilder(object):
         ray_context.build_result([res])
     
     @staticmethod
-    def apply(ray_context: RayContext):
-        # conf = ray_context.conf()
-        # udf_name = conf["UDF_CLIENT"]
-        # udf_master = ray.get_actor(udf_name)
-        # [index, worker] = ray.get(udf_master.get.remote())
-        # input_value = [row["value"] for row in ray_context.python_context.fetch_once_as_rows()]
-        # try:
-        #     res = ray.get(worker.apply.remote(input_value))
-        # except Exception as inst:
-        #     res = {}
-        #     print(inst)
-        # finally:    
-        #     ray.get(udf_master.give_back.remote(index))
-        # loop = asyncio.get_event_loop()
-        # res = loop.run_until_complete(UDFBuilder.async_apply(ray_context))
-        # ray_context.build_result([res])
-        UDFBuilder.block_apply(ray_context)
+    def apply(ray_context: RayContext):        
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(UDFBuilder.async_apply(ray_context))        
+        # UDFBuilder.block_apply(ray_context)
 
 
 class UDFBuildInFunc(object):
