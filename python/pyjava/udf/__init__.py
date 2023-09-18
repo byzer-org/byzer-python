@@ -212,6 +212,22 @@ class UDFBuilder(object):
         return res
 
     @staticmethod
+    def block_apply(ray_context: RayContext):
+        conf = ray_context.conf()
+        udf_name = conf["UDF_CLIENT"]
+        udf_master = ray.get_actor(udf_name)
+        [index, worker] = ray.get(udf_master.get.remote())
+        input_value = [row["value"] for row in ray_context.python_context.fetch_once_as_rows()]
+        try:
+            res = ray.get(worker.apply.remote(input_value))
+        except Exception as inst:
+            res = {}
+            print(inst)
+        finally:    
+            ray.get(udf_master.give_back.remote(index))        
+        ray_context.build_result([res])
+    
+    @staticmethod
     def apply(ray_context: RayContext):
         # conf = ray_context.conf()
         # udf_name = conf["UDF_CLIENT"]
