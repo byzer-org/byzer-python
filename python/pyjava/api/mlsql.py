@@ -428,10 +428,12 @@ add comment like: `#%dataMode=data` if you are in notebook.
         out_ser = ArrowStreamSerializer()
         import pyarrow as pa
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            # catch socket.gaierror
             try:
                 sock.connect((data_server.host, data_server.port))
             except Exception as e:
-                raise Exception(f"connect to {data_server.host}:{data_server.port} failed. reason:{e}")    
+                msg = f"connect to {data_server.host}:{data_server.port} failed"                
+                raise Exception(msg,e)                
             buffer_size = int(os.environ.get("BUFFER_SIZE", 65536))
             infile = sock.makefile("rb", buffer_size)  # os.fdopen(os.dup(sock.fileno()), "rb", buffer_size)
             result = out_ser.load_stream(infile)
