@@ -7,6 +7,7 @@ from ray.util.client.common import ClientActorHandle, ClientObjectRef
 from pyjava.api.mlsql import RayContext
 from pyjava.storage import streaming_tar
 import threading
+import asyncio
 from ..utils import print_flush
 
 @ray.remote
@@ -174,19 +175,57 @@ class UDFBuilder(object):
         ray_context.build_result([])
 
     @staticmethod
-    def apply(ray_context: RayContext):
+    async def async_apply(ray_context: RayContext):
         conf = ray_context.conf()
         udf_name = conf["UDF_CLIENT"]
-        udf_master = ray.get_actor(udf_name)
-        [index, worker] = ray.get(udf_master.get.remote())
-        input_value = [row["value"] for row in ray_context.python_context.fetch_once_as_rows()]
-        try:
-            res = ray.get(worker.apply.remote(input_value))
-        except Exception as inst:
-            res = {}
-            print(inst)
-        finally:    
-            ray.get(udf_master.give_back.remote(index))
+         
+        # get worker and input value are all io operation,
+        # so we use asyncio/threading to fetch them in parallel and not block the main thread.        
+        def get_worker(udf_name):
+            udf_master = ray.get_actor(udf_name)
+            [index, worker] = ray.get(udf_master.get.remote())
+            return udf_master,index,worker
+        def get_input(ray_context):
+            input_value = [row["value"] for row in ray_context.python_context.fetch_once_as_rows()]
+            return input_value
+        
+        def get_result(udf_master,index,worker,input_value):
+            try:
+                res = ray.get(worker.apply.remote(input_value))
+            except Exception as inst:
+                res = {}
+                print(inst)
+            finally:    
+                ray.get(udf_master.give_back.remote(index))
+            return res
+        
+        task1 = asyncio.to_thread(get_input,ray_context)
+        task2 = asyncio.to_thread(get_worker,udf_name)
+        
+
+        results = await asyncio.gather(task1, task2)
+        input_value = results[0]
+        udf_master,index,worker = results[1]
+        
+        task3 = asyncio.to_thread(get_result,udf_master,index,worker,input_value)
+        res = await task3
+        return res
+
+    @staticmethod
+    def apply(ray_context: RayContext):
+        # conf = ray_context.conf()
+        # udf_name = conf["UDF_CLIENT"]
+        # udf_master = ray.get_actor(udf_name)
+        # [index, worker] = ray.get(udf_master.get.remote())
+        # input_value = [row["value"] for row in ray_context.python_context.fetch_once_as_rows()]
+        # try:
+        #     res = ray.get(worker.apply.remote(input_value))
+        # except Exception as inst:
+        #     res = {}
+        #     print(inst)
+        # finally:    
+        #     ray.get(udf_master.give_back.remote(index))
+        res = asyncio.run(UDFBuilder.async_apply(ray_context))
         ray_context.build_result([res])
 
 
