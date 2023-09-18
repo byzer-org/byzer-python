@@ -99,14 +99,7 @@ class UDFMaster(object):
                 if self.actor_index_concurrency[index] > 0:
                     self.actor_index_concurrency[index] = self.actor_index_concurrency[index] - 1
                     return [index, self.actors[index]]
-        raise Exception("No idle UDFWorker")   
-
-    async def async_get(self) -> List[Any]:
-        pass
-
-    async def async_give_back(self,index)->NoReturn:
-        pass     
-
+        raise Exception("No idle UDFWorker")       
 
     def give_back(self, index) -> NoReturn:
         '''
