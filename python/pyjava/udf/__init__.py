@@ -2,7 +2,6 @@ import uuid
 import time
 from typing import Any, NoReturn, Callable, Dict, List
 import ray
-from ray.util import ActorPool
 from ray.util.client.common import ClientActorHandle, ClientObjectRef
 
 from pyjava.api.mlsql import RayContext
@@ -149,6 +148,9 @@ class UDFWorker(object):
             udf_name  = self.conf["UDF_CLIENT"] if "UDF_CLIENT" in self.conf else "UNKNOW MODEL"
             raise Exception(f"[{udf_name}] UDFWorker is not ready")
         return self.apply_func(self.model, v)
+        
+    def is_coroutine(self):        
+        return asyncio.iscoroutinefunction(self.apply_func) or asyncio.iscoroutine(self.apply_func) 
     
     async def async_apply(self,v:Any) -> Any:
         if not self.ready:
@@ -202,7 +204,7 @@ class UDFBuilder(object):
         ray_context.build_result([])
 
     @staticmethod
-    async def async_apply(ray_context: RayContext):
+    async def _async_apply(ray_context: RayContext):
         conf = ray_context.conf()
         udf_name = conf["UDF_CLIENT"]
          
@@ -211,12 +213,21 @@ class UDFBuilder(object):
         def get_worker(udf_name):
             udf_master = ray.get_actor(udf_name)
             [index, worker] = ray.get(udf_master.get.remote())
-            return udf_master,index,worker
+            is_coroutine = ray.get(worker.is_coroutine.remote())
+            return udf_master,index,worker,is_coroutine
         def get_input(ray_context):
             input_value = [row["value"] for row in ray_context.python_context.fetch_once_as_rows()]
             return input_value
         
-        def get_result(udf_master,index,worker,input_value):
+               
+        task1 = asyncio.to_thread(get_input,ray_context)
+        task2 = asyncio.to_thread(get_worker,udf_name)        
+
+        results = await asyncio.gather(task1, task2)
+        input_value = results[0]
+        udf_master,index,worker,is_coroutine = results[1]
+
+        async def get_result(udf_master,index,worker,input_value):
             try:
                 res = ray.get(worker.apply.remote(input_value))
             except Exception as inst:
@@ -224,22 +235,23 @@ class UDFBuilder(object):
                 print(inst)
             finally:    
                 ray.get(udf_master.give_back.remote(index))
-            return res
-        
-        task1 = asyncio.to_thread(get_input,ray_context)
-        task2 = asyncio.to_thread(get_worker,udf_name)
-        
+            return res    
 
-        results = await asyncio.gather(task1, task2)
-        input_value = results[0]
-        udf_master,index,worker = results[1]
+        if is_coroutine:        
+            try:
+                res = await worker.async_apply.remote(input_value)
+            except Exception as inst:
+                res = {}
+                print(inst)
+            finally:    
+                ray.get(udf_master.give_back.remote(index)) 
+        else:
+            res = await get_result(udf_master,index,worker,input_value)            
         
-        task3 = asyncio.to_thread(get_result,udf_master,index,worker,input_value)
-        res = await task3
         ray_context.build_result([res])
 
     @staticmethod
-    def block_apply(ray_context: RayContext):
+    def _block_apply(ray_context: RayContext):
         conf = ray_context.conf()
         udf_name = conf["UDF_CLIENT"]
         udf_master = ray.get_actor(udf_name)
@@ -255,10 +267,14 @@ class UDFBuilder(object):
         ray_context.build_result([res])
     
     @staticmethod
-    def apply(ray_context: RayContext):        
+    def async_apply(ray_context: RayContext):        
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(UDFBuilder.async_apply(ray_context))        
-        # UDFBuilder.block_apply(ray_context)
+        loop.run_until_complete(UDFBuilder._async_apply(ray_context))        
+
+    @staticmethod
+    def apply(ray_context: RayContext):                
+        # UDFBuilder._block_apply(ray_context)  
+        UDFBuilder.async_apply(ray_context)  
 
 
 class UDFBuildInFunc(object):
