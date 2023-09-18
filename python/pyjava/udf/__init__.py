@@ -2,6 +2,7 @@ import uuid
 import time
 from typing import Any, NoReturn, Callable, Dict, List
 import ray
+from ray.util import ActorPool
 from ray.util.client.common import ClientActorHandle, ClientObjectRef
 
 from pyjava.api.mlsql import RayContext
@@ -30,8 +31,12 @@ class UDFMaster(object):
         self.conf = conf
         self.init_func = init_func
         self.apply_func = apply_func
-        self.actors = {}
-        self._idle_actors = []
+        # [actor1,actor2,actor3]
+        self.actors = []
+        # [1,2,3]
+        self.actor_indices = []                
+        # [4,4,4] concurrency per actor
+        self.actor_index_concurrency = []
     
     def workers(self):
         return self.actors.values()
@@ -78,28 +83,35 @@ class UDFMaster(object):
               UDFWorker.options(max_concurrency=workerMaxConcurrency, **udf_worker_conf).remote(model_refs, conf, self.init_func,
                                                           self.apply_func)) for index in
              range(self.num)])
-        self._idle_actors = [index for index in range(self.num)]   
+        self.actor_indices = [index for index in range(self.num)]
+        self.actor_index_concurrency = [workerMaxConcurrency for _ in range(self.num)]   
 
 
     def get(self) -> List[Any]:
         '''
           get a idle UDFWorker to process inference
-        '''
-        while len(self._idle_actors) == 0:
-                time.sleep(0.001)
-        with self.lock:            
-            index = self._idle_actors.pop()        
-        return [index, self.actors[index]]
+        '''        
+        while sum(self.actor_index_concurrency) == 0:
+            time.sleep(0.001)
 
-    def give_back(self, v) -> NoReturn:
+        # find a idle actor index, the idle actor index in self.actor_index_conurrency should be > 0
+        with self.lock:            
+            for index in self.actor_indices:
+                if self.actor_index_concurrency[index] > 0:
+                    self.actor_index_concurrency[index] = self.actor_index_concurrency[index] - 1
+                    return [index, self.actors[index]]
+        raise Exception("No idle UDFWorker")        
+
+
+    def give_back(self, index) -> NoReturn:
         '''
           give back a idle UDFWorker
         '''
         with self.lock:
-            self._idle_actors.append(v)
+            self.actor_index_concurrency[index] = self.actor_index_concurrency[index] + 1
 
     def shutdown(self) -> NoReturn:
-        [ray.kill(self.actors[index]) for index in self._idle_actors]
+        [ray.kill(self.actors[index]) for index in self.actor_indices]
 
 
 @ray.remote
