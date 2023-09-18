@@ -241,7 +241,12 @@ class UDFBuilder(object):
         #     print(inst)
         # finally:    
         #     ray.get(udf_master.give_back.remote(index))
-        res = asyncio.run(UDFBuilder.async_apply(ray_context))
+        try :
+            loop = asyncio.get_running_loop()
+        except:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        res = loop.run_until_complete(UDFBuilder.async_apply(ray_context))
         ray_context.build_result([res])
 
 
