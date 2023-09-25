@@ -35,6 +35,21 @@ async def _transfer_to_ob(udf_name, conf,model_refs):
     await asyncio.gather(producer_task,worker_task)
     print_flush(f"MODEL[{udf_name}] UDFMaster push model to object store cost {time.time() - time1} seconds") 
 
+def block_transfer_to_ob(udf_name,conf,model_refs):
+    
+    print_flush(f"MODEL[{udf_name}] Transfer model from {model_servers[0].host}:{model_servers[0].port} to Ray Object Store")                       
+    time1 = time.time()
+    model_servers = RayContext.parse_servers(conf["modelServers"]) 
+    udf_name  = conf["UDF_CLIENT"] if "UDF_CLIENT" in conf else "UNKNOW MODEL"
+    
+    for item in RayContext.collect_from(model_servers):
+        model_refs.append(ray.put(item)) 
+    
+    print_flush(f"MODEL[{udf_name}] UDFMaster push model to object store cost {time.time() - time1} seconds")            
+
+    
+
 def transfer_to_ob(udf_name, conf,model_refs):
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(_transfer_to_ob(udf_name, conf,model_refs))                
+    # loop = asyncio.get_event_loop()
+    # loop.run_until_complete(_transfer_to_ob(udf_name, conf,model_refs))                
+    block_transfer_to_ob(udf_name, conf,model_refs)
