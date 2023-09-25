@@ -36,4 +36,5 @@ async def _transfer_to_ob(udf_name, conf,model_refs):
     print_flush(f"MODEL[{udf_name}] UDFMaster push model to object store cost {time.time() - time1} seconds") 
 
 def transfer_to_ob(udf_name, conf,model_refs):
-    asyncio.run(_transfer_to_ob(udf_name, conf,model_refs))
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(_transfer_to_ob(udf_name, conf,model_refs))                
