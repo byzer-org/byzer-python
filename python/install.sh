@@ -18,6 +18,9 @@ pip install ${project}-${version}-py3-none-any.whl && cd -
 
 export MODE=${MODE:-"dev"}
 if [[ ${MODE} == "release" ]];then
+ git tag v${version}
+ git push gitee v${version}
+#  git push origin v${version}
  echo "Uploading Pyjava dist..."
  twine upload dist/*
 fi
