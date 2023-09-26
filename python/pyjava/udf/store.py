@@ -37,9 +37,9 @@ async def _transfer_to_ob(udf_name, conf,model_refs):
 
 def block_transfer_to_ob(udf_name,conf,model_refs):
     
-    print_flush(f"MODEL[{udf_name}] Transfer model from {model_servers[0].host}:{model_servers[0].port} to Ray Object Store")                       
-    time1 = time.time()
     model_servers = RayContext.parse_servers(conf["modelServers"]) 
+    print_flush(f"MODEL[{udf_name}] Transfer model from {model_servers[0].host}:{model_servers[0].port} to Ray Object Store")                       
+    time1 = time.time()    
     udf_name  = conf["UDF_CLIENT"] if "UDF_CLIENT" in conf else "UNKNOW MODEL"
     
     for item in RayContext.collect_from(model_servers):
