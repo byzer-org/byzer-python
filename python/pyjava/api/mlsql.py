@@ -254,10 +254,11 @@ class RayContext(object):
                 worker = ray._private.worker.global_worker
                 try:
                     worker.check_connected()
-                except Exception as e:
                     if not worker.load_code_from_local:
                         worker.shutdown()
-                                                
+                except Exception as e:
+                    pass
+
             from pyjava.rayfix import RayWrapper
             ray = RayWrapper()               
             ray.ray_instance.init(address="auto",ignore_reinit_error=True,namespace="default",**kwargs)
