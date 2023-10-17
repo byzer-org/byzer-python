@@ -252,9 +252,12 @@ class RayContext(object):
             if "job_config" in kwargs:
                 import ray
                 worker = ray._private.worker.global_worker
-                if not worker.load_code_from_local:
-                    worker.shutdown()
-        
+                try:
+                    worker.check_connected()
+                except Exception as e:
+                    if not worker.load_code_from_local:
+                        worker.shutdown()
+                                                
             from pyjava.rayfix import RayWrapper
             ray = RayWrapper()               
             ray.ray_instance.init(address="auto",ignore_reinit_error=True,namespace="default",**kwargs)
