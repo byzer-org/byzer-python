@@ -249,6 +249,11 @@ class RayContext(object):
         # to speed up connect to ray. if we use ray client server,
         # it may slow and not stable.
         if url == "worker":
+            if "code_search_path" in kwargs:
+                worker = ray._private.worker.global_worker
+                if not worker.load_code_from_local:
+                    worker.shutdown()
+        
             from pyjava.rayfix import RayWrapper
             ray = RayWrapper()               
             ray.ray_instance.init(address="auto",ignore_reinit_error=True,namespace="default",**kwargs)
