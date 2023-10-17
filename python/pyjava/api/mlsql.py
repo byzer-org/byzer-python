@@ -250,6 +250,7 @@ class RayContext(object):
         # it may slow and not stable.
         if url == "worker":
             if "job_config" in kwargs:
+                import ray
                 worker = ray._private.worker.global_worker
                 if not worker.load_code_from_local:
                     worker.shutdown()
