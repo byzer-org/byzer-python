@@ -249,7 +249,7 @@ class RayContext(object):
         # to speed up connect to ray. if we use ray client server,
         # it may slow and not stable.
         if url == "worker":
-            if "code_search_path" in kwargs:
+            if "job_config" in kwargs:
                 worker = ray._private.worker.global_worker
                 if not worker.load_code_from_local:
                     worker.shutdown()
