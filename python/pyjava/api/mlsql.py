@@ -251,8 +251,9 @@ class RayContext(object):
         if url == "worker":
             from pyjava.rayfix import RayWrapper
             ray = RayWrapper()               
-            ray.ray_instance.init(address="auto",ignore_reinit_error=True,namespace="default")
+            ray.ray_instance.init(address="auto",ignore_reinit_error=True,namespace="default",**kwargs)
             return context.rayContext
+        
 
         if url == "local":
             from pyjava.rayfix import RayWrapper
