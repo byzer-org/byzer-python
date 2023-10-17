@@ -249,6 +249,7 @@ class RayContext(object):
         # to speed up connect to ray. if we use ray client server,
         # it may slow and not stable.
         if url == "worker":
+            # is_udf_client = context.conf.get("UDF_CLIENT")
             if "job_config" in kwargs:
                 import ray
                 worker = ray._private.worker.global_worker
