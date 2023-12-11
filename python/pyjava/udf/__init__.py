@@ -36,6 +36,7 @@ class UDFMaster(object):
         self.actor_indices = []                
         # [4,4,4] concurrency per actor
         self.actor_index_concurrency = []
+        self.actor_index_update_time = []
     
     def workers(self):
         return self.actors.values()
@@ -83,7 +84,8 @@ class UDFMaster(object):
                                                           self.apply_func)) for index in
              range(self.num)])
         self.actor_indices = [index for index in range(self.num)]
-        self.actor_index_concurrency = [workerMaxConcurrency for _ in range(self.num)]   
+        self.actor_index_concurrency = [workerMaxConcurrency for _ in range(self.num)] 
+        self.actor_index_update_time = [time.time() for _ in range(self.num)]  
 
 
     def get(self) -> List[Any]:
@@ -98,8 +100,15 @@ class UDFMaster(object):
             for index in self.actor_indices:
                 if self.actor_index_concurrency[index] > 0:
                     self.actor_index_concurrency[index] = self.actor_index_concurrency[index] - 1
+                    self.actor_index_update_time[index] = time.time()
                     return [index, self.actors[index]]
-        raise Exception("No idle UDFWorker")       
+        raise Exception("No idle UDFWorker") 
+
+    def reset(self):        
+        workerMaxConcurrency = int(self.conf.get("workerMaxConcurrency", "1"))
+        self.actor_indices = [index for index in range(self.num)]
+        self.actor_index_concurrency = [workerMaxConcurrency for _ in range(self.num)] 
+        self.actor_index_update_time = [time.time() for _ in range(self.num)]  
 
     def give_back(self, index) -> NoReturn:
         '''
@@ -107,6 +116,7 @@ class UDFMaster(object):
         '''
         with self.lock:
             self.actor_index_concurrency[index] = self.actor_index_concurrency[index] + 1
+            self.actor_index_update_time[index] = time.time()
 
     def shutdown(self) -> NoReturn:
         [ray.kill(self.actors[index]) for index in self.actor_indices]
