@@ -8,6 +8,7 @@ from pyjava.api.mlsql import RayContext
 from pyjava.storage import streaming_tar
 import threading
 import asyncio
+import numpy as np
 from ..utils import print_flush
 
 @ray.remote
@@ -36,7 +37,7 @@ class UDFMaster(object):
         self.actor_indices = []                
         # [4,4,4] concurrency per actor
         self.actor_index_concurrency = []
-        self.actor_index_update_time = []
+        self.actor_index_update_time = np.array([])
     
     def workers(self):
         return self.actors.values()
@@ -85,7 +86,7 @@ class UDFMaster(object):
              range(self.num)])
         self.actor_indices = [index for index in range(self.num)]
         self.actor_index_concurrency = [workerMaxConcurrency for _ in range(self.num)] 
-        self.actor_index_update_time = [time.time() for _ in range(self.num)]  
+        self.actor_index_update_time = np.array([time.monotonic() for _ in range(self.num)])
 
 
     def get(self) -> List[Any]:
@@ -96,19 +97,27 @@ class UDFMaster(object):
             time.sleep(0.001)
 
         # find a idle actor index, the idle actor index in self.actor_index_conurrency should be > 0
-        with self.lock:            
-            for index in self.actor_indices:
+        with self.lock: 
+            retry = 3
+            while True:           
+                index = np.argmin(self.actor_index_update_time)                
                 if self.actor_index_concurrency[index] > 0:
-                    self.actor_index_concurrency[index] = self.actor_index_concurrency[index] - 1
-                    self.actor_index_update_time[index] = time.time()
-                    return [index, self.actors[index]]
+                        self.actor_index_concurrency[index] = self.actor_index_concurrency[index] - 1
+                        self.actor_index_update_time[index] = time.monotonic()
+                        return [index, self.actors[index]]
+                else:
+                    if retry > 0:
+                        retry = retry - 1                        
+                    else:
+                        break
+                
         raise Exception("No idle UDFWorker") 
 
     def reset(self):        
         workerMaxConcurrency = int(self.conf.get("workerMaxConcurrency", "1"))
         self.actor_indices = [index for index in range(self.num)]
         self.actor_index_concurrency = [workerMaxConcurrency for _ in range(self.num)] 
-        self.actor_index_update_time = [time.time() for _ in range(self.num)]  
+        self.actor_index_update_time = np.array([time.monotonic() for _ in range(self.num)]  )
 
     def give_back(self, index) -> NoReturn:
         '''
@@ -116,7 +125,7 @@ class UDFMaster(object):
         '''
         with self.lock:
             self.actor_index_concurrency[index] = self.actor_index_concurrency[index] + 1
-            self.actor_index_update_time[index] = time.time()
+            # self.actor_index_update_time[index] = time.monotonic()
 
     def shutdown(self) -> NoReturn:
         [ray.kill(self.actors[index]) for index in self.actor_indices]
