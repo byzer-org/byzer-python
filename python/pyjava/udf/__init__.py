@@ -96,10 +96,12 @@ class UDFMaster(object):
         self.counter = 0
 
 
-    def get(self) -> List[Any]:
+    def get(self,index = -1 ) -> List[Any]:
         '''
           get a idle UDFWorker to process inference
-        '''      
+        '''   
+        if index != -1:
+            return [index, self.actors[index]]   
 
         if self.load_balance == "round_robin":
             with self.lock: 
