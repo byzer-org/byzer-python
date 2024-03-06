@@ -102,9 +102,10 @@ class UDFMaster(object):
         '''      
 
         if self.load_balance == "round_robin":
-            index = self.counter
-            self.counter = (self.counter + 1) % self.num
-            return [index, self.actors[index]]
+            with self.lock: 
+                index = self.counter
+                self.counter = (self.counter + 1) % self.num
+                return [index, self.actors[index]]
 
         while sum(self.actor_index_concurrency) == 0:
             time.sleep(0.001)
