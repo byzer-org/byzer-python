@@ -84,15 +84,28 @@ class UDFMaster(object):
               UDFWorker.options(**udf_worker_conf).remote(model_refs, conf, self.init_func,
                                                           self.apply_func)) for index in
              range(self.num)])
+
+        self.load_balance = conf.get("load_balance", "lru").lower()
+
+        ## LRU    
         self.actor_indices = [index for index in range(self.num)]
         self.actor_index_concurrency = [workerMaxConcurrency for _ in range(self.num)] 
-        self.actor_index_update_time = np.array([time.monotonic() for _ in range(self.num)])
+        self.actor_index_update_time = np.array([time.monotonic() for _ in range(self.num)])    
+
+        ## Round Robin 
+        self.counter = 0
 
 
     def get(self) -> List[Any]:
         '''
           get a idle UDFWorker to process inference
-        '''        
+        '''      
+
+        if self.load_balance == "round_robin":
+            index = self.counter
+            self.counter = (self.counter + 1) % self.num
+            return [index, self.actors[index]]
+
         while sum(self.actor_index_concurrency) == 0:
             time.sleep(0.001)
 
@@ -118,6 +131,7 @@ class UDFMaster(object):
         self.actor_indices = [index for index in range(self.num)]
         self.actor_index_concurrency = [workerMaxConcurrency for _ in range(self.num)] 
         self.actor_index_update_time = np.array([time.monotonic() for _ in range(self.num)]  )
+        self.counter = 0
 
     def give_back(self, index) -> NoReturn:
         '''
