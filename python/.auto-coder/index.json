@@ -1,0 +1,97 @@
+{
+  "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/cloudpickle.py": {
+    "symbols": "函数：auto_implement_function_template\n变量：a\n类：\n导入语句：import os,import time,from loguru import logger,import byzerllm\n\n函数：cell_set\n函数：_walk_global_ops\n类：CloudPickler\n函数：save_memoryview\n函数：save_module\n函数：save_codeobject\n函数：save_function\n函数：_save_subimports\n函数：save_dynamic_class\n函数：save_function_tuple\n函数：extract_code_globals\n函数：extract_func_data\n函数：save_builtin_function\n函数：save_global\n函数：save_instancemethod\n函数：save_inst\n函数：save_property\n函数：save_classmethod\n函数：save_itemgetter\n函数：save_attrgetter\n函数：auto_implement_function_template\n变量：a\n类：\n导入语句：import os,import time,from loguru import logger,import byzerllm",
+    "last_modified": 1665584942.0,
+    "md5": "5f2bbc068d437924c16ec55612f3737e"
+  },
+  "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/worker.py": {
+    "symbols": "函数：main, chain, read_command, process\n变量：has_resource_module, pickleSer, utf8_deserializer, globals_namespace, memory_limit_mb, total_memory, new_limit, context_id, data_manager, context\n类：\n导入语句：from __future__ import print_function,from pyjava.api.mlsql import PythonContext,from pyjava.cache.code_cache import CodeCache,from pyjava.utils import *,import traceback,import logging,from pyjava.serializers import write_with_length, write_int, read_int, read_bool, SpecialLengths, UTF8Deserializer, PickleSerializer, ArrowStreamPandasSerializer, ArrowStreamSerializer,import sys,import os,import ray",
+    "last_modified": 1665584942.0,
+    "md5": "e0517a8945e64c649888adc54a0f93e0"
+  },
+  "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/version.py": {
+    "symbols": "变量：__version__",
+    "last_modified": 1713250112.9387515,
+    "md5": "20b93d7332b59a5cb68d8ac6ebee8e0c"
+  },
+  "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/serializers.py": {
+    "symbols": "函数：auto_implement_function_template\n变量：a\n类：\n导入语句：import os,import time,from loguru import logger,import byzerllm\n函数：__main__\n变量：\n类：RecordBatchStreamWriter\n导入语句：pyarrow.RecordBatchStreamWriter from ArrowStreamSerializer,import doctest",
+    "last_modified": 1610418628.0,
+    "md5": "908ba838d744ae22fac21267226726e0"
+  },
+  "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/__init__.py": {
+    "symbols": "函数：since, copy_func, keyword_only\n类：\n变量：\n导入语句：import types,from functools import wraps,from pyjava.api.mlsql import RayContext, PythonContext,from pyjava.storage import streaming_tar",
+    "last_modified": 1678067139.0,
+    "md5": "859e943c3c24025964464a6992ff4baa"
+  },
+  "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/utils.py": {
+    "symbols": "函数：is_dev, require_minimum_pandas_version, require_minimum_pyarrow_version, _exception_message, _do_server_auth, local_connect_and_auth, print_flush\n变量：basestring, pickleSer, utf8_deserializer, minimum_pandas_version, minimum_pyarrow_version\n类：\n导入语句：import os,import sys,from pyjava.serializers import write_with_length, UTF8Deserializer, PickleSerializer",
+    "last_modified": 1713250112.9385378,
+    "md5": "f4d7001328885e11bfc1ef435c1ae5b7"
+  },
+  "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/rayfix.py": {
+    "symbols": "函数：last, init, shutdown, options, get_actor\n类：RayWrapper\n变量：ray_version, ray_instance\n导入语句：from distutils.version import StrictVersion,import ray,import logging",
+    "last_modified": 1665584942.0,
+    "md5": "384b5184485c9343ee9b82d96a4e37fb"
+  },
+  "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/daemon.py": {
+    "symbols": "函数：compute_real_exit_code, worker, manager\n类：\n变量：\n导入语句：import numbers,import os,import signal,import select,import socket,import sys,import traceback,import time,import gc,from errno import EINTR, EAGAIN,from socket import AF_INET, SOCK_STREAM, SOMAXCONN,from signal import SIGHUP, SIGTERM, SIGCHLD, SIG_DFL, SIG_IGN, SIGINT,from pyjava.worker import main as worker_main,from pyjava.serializers import read_int, write_int, write_with_length, UTF8Deserializer",
+    "last_modified": 1610418628.0,
+    "md5": "f0d9c5494c6457d4bdedf50f6ab8be1d"
+  },
+  "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/cache/code_cache.py": {
+    "symbols": "函数：get,gen_cache\n变量：cache,cache_max_size\n类：CodeCache\n导入语句：",
+    "last_modified": 1610418628.0,
+    "md5": "c93e2a0d2ca4770910e07034f6de1bb2"
+  },
+  "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/example/RayServerExample.py": {
+    "symbols": "函数：echo, RayDataServer.options, connect_info, serve\n变量：os, sys, pd, DataServer, RayDataServer, RayWrapper, ray, ddata, server_id, java_server, rds\n类：DataServer, RayDataServer, RayWrapper\n导入语句：import os,import pandas as pd,import sys,from pyjava.api.mlsql import DataServer,from pyjava.api.serve import RayDataServer,from pyjava.rayfix import RayWrapper",
+    "last_modified": 1665584942.0,
+    "md5": "22b9ccd342ff0f7878204ec90b758938"
+  },
+  "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/example/OnceServerExample.py": {
+    "symbols": "函数：serve, bind\n变量：os, pandas, ddata, server\n类：OnceServer\n导入语句：import os,import pandas as pd,from pyjava.api.serve import OnceServer",
+    "last_modified": 1610418628.0,
+    "md5": "79c3fef00376147b6b8f59ccdbf128fd"
+  },
+  "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/datatype/types.py": {
+    "symbols": "函数：auto_implement_function_template\n变量：a\n类：\n导入语句：import os,import time,from loguru import logger,import byzerllm\n函数：_infer_type, _infer_schema, _has_nulltype, _merge_type, _need_converter, _create_converter, _make_type_verifier, _create_row_inbound_converter, _create_row\n类：Row\n变量：_type_mappings, _array_signed_int_typecode_ctype_mappings, _array_unsigned_int_typecode_ctype_mappings, _array_type_mappings, _acceptable_types\n导入语句：import os,import time,from loguru import logger,import byzerllm,import ctypes,import sys,import decimal,import datetime,import platform\n函数：_check_series_localize_timestamps, _check_series_convert_timestamps_internal, _check_series_convert_timestamps_localize, _check_series_convert_timestamps_local_tz, _check_series_convert_timestamps_tz_local, _test\n变量：\n类：\n导入语句：from pyjava.utils import require_minimum_pandas_version,import pandas as pd,from pandas.api.types import is_datetime64_dtype, is_datetime64tz_dtype",
+    "last_modified": 1610418628.0,
+    "md5": "bfffe1049706e642e1ce53476795cf0b"
+  },
+  "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/storage/streaming_tar.py": {
+    "symbols": "函数：build_rows_from_file, save_rows_as_file, stream_build_tar, main\n类：FileStream\n变量：BLOCK_SIZE\n导入语句：import io,import os,import tarfile,import tempfile,import uuid",
+    "last_modified": 1665584942.0,
+    "md5": "1131361f0e749371d1fb5d609702330e"
+  },
+  "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/api/mlsql.py": {
+    "symbols": "函数：DataServer.__init__, LogClient.__init__, PythonContext.__init__, PythonContext.set_output, PythonContext.build_chunk_result, PythonContext.build_result, PythonContext.build_result_from_dir, PythonContext.__del__, PythonContext.noops_fetch, PythonContext.fetch_once_as_dataframe, PythonContext.fetch_once_as_rows, PythonContext.fetch_once_as_batch_rows, PythonContext.fetch_once, PythonContext.fetch_as_dir, PythonProjectContext.__init__, PythonProjectContext.read_params_once, PythonProjectContext.input_data_dir, PythonProjectContext.output_model_dir, PythonProjectContext.__del__, RayContext.__init__, RayContext.data_servers, RayContext.conf, RayContext.data_servers_in_ray, RayContext.build_servers_in_ray, RayContext.connect, RayContext.setup, RayContext.foreach, RayContext.map_iter, RayContext.collect, RayContext.fetch_as_dir, RayContext.build_result, RayContext.build_result_from_dataframe, RayContext.build_result_from_dir, RayContext.parse_servers, RayContext.fetch_as_repeatable_file, RayContext.collect_as_file, RayContext.collect_from, RayContext.to_pandas, RayContext.to_dataset, RayContext.fetch_once_as_rows, RayContext.fetch_data_from_single_data_server, RayContext.fetch_data_from_single_data_server_as_arrow\n类：DataServer, LogClient, PythonContext, PythonProjectContext, RayContext\n变量：a\n导入语句：import logging,import os,import socket,from distutils.version import StrictVersion,import uuid,from urllib.parse import quote,import json,import pandas as pd,import sys,import pyjava.utils as utils,import requests,from pyjava.serializers import ArrowStreamSerializer,from pyjava.serializers import read_int,from pyjava.utils import utf8_deserializer,from pyjava.storage import streaming_tar,if sys.version >= '3':,else:",
+    "last_modified": 1713250112.937417,
+    "md5": "c176b59426df7fc6aa5ecf9c5943cd4b"
+  },
+  "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/api/__init__.py": {
+    "symbols": "函数：show_plt, gen_img\n变量：\n类：Utils\n导入语句：from typing import Any, NoReturn, Callable, Dict, List,import tempfile,import os,from pyjava.api.mlsql import PythonContext",
+    "last_modified": 1665584942.0,
+    "md5": "cb9c4bbac02bb189e6aeb3feeba45ab0"
+  },
+  "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/api/serve.py": {
+    "symbols": "函数：serve, bind, close, connect_info\n变量：host, port, server_id, timezone, socket, out_ser, is_bind, is_dev, java_server\n类：SocketNotBindException, DataServerWithId, OnceServer, RayDataServer\n导入语句：import logging,import os,import socket,import traceback,import ray,import pyjava.utils as utils,from pyjava.api.mlsql import RayContext,from pyjava.rayfix import RayWrapper,from pyjava.serializers import write_with_length, write_int, read_int, SpecialLengths, ArrowStreamPandasSerializer",
+    "last_modified": 1679064956.0,
+    "md5": "702cf006938dcd441fed06a70b534088"
+  },
+  "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/udf/store.py": {
+    "symbols": "函数：worker, producer, _transfer_to_ob, block_transfer_to_ob, transfer_to_ob\n变量：queue, udf_name, model_refs, items, conf, model_servers, worker_task, producer_task\n类：\n导入语句：import uuid,import asyncio,import time,from typing import Any, NoReturn, Callable, Dict, List,import ray,from pyjava.api.mlsql import RayContext,from ..utils import print_flush",
+    "last_modified": 1713250112.9383185,
+    "md5": "aa899b90c348b63d7ad1a77d4757704f"
+  },
+  "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/udf/__init__.py": {
+    "symbols": "函数：auto_implement_function_template, build_model, apply, async_apply, _async_apply, _block_apply, init_tf\n类：UDFMaster, UDFWorker, UDFBuilder, UDFBuildInFunc\n变量：a, model_refs, conf, init_func, apply_func, lock, num, actors, actor_indices, actor_index_concurrency, actor_index_update_time, counter, ready, model, udf_name, max_concurrency, masterMaxConcurrency, stop_flag, temp_udf_master, build_model_jobs, input_value, res, loop\n导入语句：import uuid, import time, from typing import Any, NoReturn, Callable, Dict, List, import ray, from ray.util.client.common import ClientActorHandle, ClientObjectRef, from pyjava.api.mlsql import RayContext, from pyjava.storage import streaming_tar, import threading, import asyncio, import numpy as np, from ..utils import print_flush, import os, import time, from loguru import logger, import byzerllm, from tensorflow.keras import models",
+    "last_modified": 1713331914.0204108,
+    "md5": "6329c40d9c4ea7a8d8073cba2af30954"
+  },
+  "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/data/datasource.py": {
+    "symbols": "函数：make_block\n类：KoloRawDatasource\n变量：\n导入语句：from typing import Any, Generic, List, Callable, Union, Tuple, Iterable,import ray,from pyjava.api.mlsql import RayContext",
+    "last_modified": 1679189765.0,
+    "md5": "683b7f88706079d6f89a3742c64e6119"
+  }
+}
