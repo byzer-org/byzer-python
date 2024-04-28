@@ -1,0 +1,38 @@
+source_dir: /Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava
+target_file: /Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/output.txt 
+project_type: py
+
+model: gpt3_5_chat
+index_model: haiku_chat
+emb_model: gpt_emb
+
+index_filter_level: 1
+index_model_max_input_length: 30000
+# index_filter_workers: 2
+# enable_rag_context: true
+
+skip_build_index: false
+execute: true
+## 代码生成的时候会每次生成一个文件，现在大模型无法一次性生成太多文件，所以需要多轮生成
+enable_multi_round_generate: false
+auto_merge: true
+human_as_model: true
+
+query: |  
+   在 UDFMaster 中添加一个 stat 方法，用于呈现 UDFMaster 当前的状态，
+   包含：
+   1. worker 的数量   
+   2. 分别有多少worker处于忙和空闲状态
+   3. 当前所使用的负载均衡策略
+   4. 当前累计的请求数   
+   
+   workerMaxConcurrency 表示每个worker支持的最大并发数，例如 workerMaxConcurrency = 3 表示每个worker支持3个并发。
+
+   actor_index_concurrency 是一个记录数组，表示每个worker当前还剩下的并发数，
+   例如 actor_index_concurrency = [3, 2, 1] 表示第一个worker还剩下3个并发，第二个worker还剩下2个并发，第三个worker还剩下1个并发。
+   通过对该数组，你可以知道每个worker 当前的负载。   
+  
+   
+   
+   
+   

@@ -10,9 +10,9 @@
     "md5": "e0517a8945e64c649888adc54a0f93e0"
   },
   "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/version.py": {
-    "symbols": "变量：__version__",
-    "last_modified": 1713250112.9387515,
-    "md5": "20b93d7332b59a5cb68d8ac6ebee8e0c"
+    "symbols": "变量：__version__\n导入语句:",
+    "last_modified": 1714296501.1487954,
+    "md5": "74d2dfd8a00bfbd8b5550d3a2919d3d1"
   },
   "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/serializers.py": {
     "symbols": "函数：auto_implement_function_template\n变量：a\n类：\n导入语句：import os,import time,from loguru import logger,import byzerllm\n函数：__main__\n变量：\n类：RecordBatchStreamWriter\n导入语句：pyarrow.RecordBatchStreamWriter from ArrowStreamSerializer,import doctest",
@@ -85,13 +85,28 @@
     "md5": "aa899b90c348b63d7ad1a77d4757704f"
   },
   "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/udf/__init__.py": {
-    "symbols": "函数：auto_implement_function_template, build_model, apply, async_apply, _async_apply, _block_apply, init_tf\n类：UDFMaster, UDFWorker, UDFBuilder, UDFBuildInFunc\n变量：a, model_refs, conf, init_func, apply_func, lock, num, actors, actor_indices, actor_index_concurrency, actor_index_update_time, counter, ready, model, udf_name, max_concurrency, masterMaxConcurrency, stop_flag, temp_udf_master, build_model_jobs, input_value, res, loop\n导入语句：import uuid, import time, from typing import Any, NoReturn, Callable, Dict, List, import ray, from ray.util.client.common import ClientActorHandle, ClientObjectRef, from pyjava.api.mlsql import RayContext, from pyjava.storage import streaming_tar, import threading, import asyncio, import numpy as np, from ..utils import print_flush, import os, import time, from loguru import logger, import byzerllm, from tensorflow.keras import models",
-    "last_modified": 1713331914.0204108,
-    "md5": "6329c40d9c4ea7a8d8073cba2af30954"
+    "symbols": "函数：UDFMaster, UDFWorker, UDFBuilder, UDFBuildInFunc\n类：UDFMaster, UDFWorker, UDFBuilder, UDFBuildInFunc\n变量：\n导入语句：from pyjava.udf.udf_master import UDFMaster,from pyjava.udf.udf_worker import UDFWorker,from pyjava.udf.udf_builder import UDFBuilder,UDFBuildInFunc",
+    "last_modified": 1714296455.1492784,
+    "md5": "6752a1036ac4f62ad8094dda36c88e43"
   },
   "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/data/datasource.py": {
     "symbols": "函数：make_block\n类：KoloRawDatasource\n变量：\n导入语句：from typing import Any, Generic, List, Callable, Union, Tuple, Iterable,import ray,from pyjava.api.mlsql import RayContext",
     "last_modified": 1679189765.0,
     "md5": "683b7f88706079d6f89a3742c64e6119"
+  },
+  "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/udf/udf_master.py": {
+    "symbols": "函数：__init__, workers, create_workers, get, reset, give_back, shutdown\n类：UDFMaster\n变量：lock, num, conf, init_func, apply_func, actors, actor_indices, actor_index_concurrency, actor_index_update_time, counter, load_balance\n导入语句：import uuid,import time,from typing import Any, NoReturn, Callable, Dict, List,import ray,from ray.util.client.common import ClientObjectRef,import threading,import numpy as np,from pyjava.udf.udf_worker import UDFWorker",
+    "last_modified": 1714296489.5403085,
+    "md5": "2241ef3aa3dacf665e3d9df92f8c378f"
+  },
+  "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/udf/udf_builder.py": {
+    "symbols": "函数：build, _async_apply, _block_apply, async_apply, apply, init_tf\n类：UDFBuilder, UDFBuildInFunc\n变量：uuid, time, Any, NoReturn, Callable, Dict, List, ray, ClientObjectRef, RayContext, streaming_tar, UDFMaster, asyncio, stop_flag, counter, temp_udf_master, input_value, udf_master, index, worker, is_coroutine, res, model_refs, conf, model_path\n导入语句：import uuid,import time,from typing import Any, NoReturn, Callable, Dict, List,import ray,from ray.util.client.common import ClientObjectRef,from pyjava.api.mlsql import RayContext,from pyjava.storage import streaming_tar,from pyjava.udf.udf_master import UDFMaster,import asyncio,from tensorflow.keras import models",
+    "last_modified": 1714296446.53588,
+    "md5": "15b8a3fd6322aa2478623f776de3527e"
+  },
+  "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/udf/udf_worker.py": {
+    "symbols": "函数：build_model, apply, is_coroutine, async_apply, shutdown\n类：UDFWorker\n变量：model_refs, conf, init_func, apply_func, ready, model, udf_name, time1, time2, v, resp\n导入语句：import uuid,import time,from typing import Any, NoReturn, Callable, Dict, List,import ray,from ray.util.client.common import ClientActorHandle, ClientObjectRef,import asyncio,from pyjava.utils import print_flush",
+    "last_modified": 1714296424.8357446,
+    "md5": "e9fdc28af3b9cb2d26050c2ab29c5bfa"
   }
 }
