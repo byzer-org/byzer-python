@@ -1,4 +1,4 @@
-根据你的需求，我为 UDFMaster 抽取出了一个创建单个 worker 的 create_worker 方法，同时在 ./tests/test_udf_master.py 中增加了一个测试用例。以下是生成的代码：
+下面是根据你的需求生成的代码：
 
 ```python
 ##File: /Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/udf/udf_master.py
@@ -44,7 +44,7 @@ class UDFMaster(object):
     def workers(self):
         return self.actors.values()
     
-    def create_worker(self, index, conf):
+    def create_worker_conf(self, conf):
         udf_worker_conf = {}
 
         if "num_cpus" in conf:
@@ -72,6 +72,10 @@ class UDFMaster(object):
         if len(custom_resources) > 0:
             udf_worker_conf["resources"] = dict(custom_resources)
 
+        return udf_worker_conf    
+    
+    def create_worker(self, index, conf):    
+        udf_worker_conf = self.create_worker_conf(conf)        
         udf_name  = conf["UDF_CLIENT"] if "UDF_CLIENT" in conf else "UNKNOW MODEL"
         standalone = conf.get("standalone", "false") == "true"
         model_refs = []
@@ -170,44 +174,73 @@ class UDFMaster(object):
             "worker_max_concurrency": self.conf.get("workerMaxConcurrency", "1"),
             "workers_last_work_time": [f"{time.monotonic() - self.actor_index_update_time[index]}s" for index in range(self.num)],
         }
+
+    def reload_worker(self, index):
+        '''
+        重启指定序号的worker
+        '''
+        if "modelServers" in self.conf:
+            raise Exception("reload_worker is not supported when using model server")
         
+        # 先启动新的worker
+        new_worker = self.create_worker(index, self.conf)
+        ray.get(new_worker.build_model.remote())
+        
+        # 替换actors中的引用
+        old_worker = self.actors[index]
+        self.actors[index] = new_worker
+        
+        # 关闭老的worker  
+        ray.kill(old_worker)
+
 
 ```
 
 ```python
-##File: ./tests/test_udf_master.py
-import pytest
+##File: /Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/tests/test_udf_master.py
+import unittest
 from pyjava.udf.udf_master import UDFMaster
 from pyjava.udf.udf_worker import UDFWorker
+import ray
+import pytest
+
+@pytest.fixture
+def init_ray():
+    # Start Ray
+    ray.init(ignore_reinit_error=True)
+    yield
+    # Shutdown Ray
+    ray.shutdown()
 
 def init_func(model_refs, conf):
-    return "Test Model"
+    return "model"
 
 def apply_func(model, data):
-    return f"Result: {data}"
-
-@pytest.mark.asyncio
-async def test_create_worker():
-    conf = {
-        "num_cpus": "1",
-        "infer_backend": "transformers",
-        "UDF_CLIENT": "Test Model"
-    }
+    return data
+        
+def test_reload_worker(init_ray):
+    udf_master = UDFMaster.remote(3, {}, init_func, apply_func)
+    ray.get(udf_master.create_workers.remote({}))
     
-    udf_master = UDFMaster.remote(1, conf, init_func, apply_func)
-    worker = await udf_master.create_worker.remote(0, conf)
+    old_worker = ray.get(udf_master.actors[0])
+    ray.get(udf_master.reload_worker.remote(0))
+    new_worker = ray.get(udf_master.actors[0])
     
-    assert isinstance(worker, UDFWorker)
+    assert old_worker != new_worker
     
-    await worker.build_model.remote()
-    result = await worker.apply.remote("Test Data")
-    
-    assert result == "Result: Test Data"
-
+    # Test exception when modelServers in conf
+    udf_master = UDFMaster.remote(3, {"modelServers":"ms"}, init_func, apply_func)
+    ray.get(udf_master.create_workers.remote({"modelServers":"ms"}))
+    with pytest.raises(Exception):
+        ray.get(udf_master.reload_worker.remote(0))
 ```
 
-以上代码中，我在 UDFMaster 类中抽取出了 create_worker 方法，用于创建单个 worker。该方法包含了创建 worker 所需的所有配置参数，如 num_cpus、infer_backend 等。
+上面的代码做了以下修改：
 
-同时，我在 ./tests/test_udf_master.py 文件中增加了一个测试用例 test_create_worker，用于测试 create_worker 方法的功能。测试用例创建了一个 UDFMaster 实例，并使用 create_worker 方法创建了一个 worker。然后对创建的 worker 进行了模型构建和应用测试，确保其能够正常工作。
+1. 在UDFMaster类中增加了reload_worker方法，可以根据index重启指定的worker，先启动新worker，再替换actors中的引用，最后关闭老worker。
 
-请注意，我为代码块添加了相应的文件路径标记，以符合你提供的格式要求。
+2. 在reload_worker方法中，如果配置中有"modelServers"，则抛出不支持reload_worker的错误。
+
+3. 添加了test_udf_master.py的测试用例，测试reload_worker方法的功能，以及使用model server时调用reload_worker会抛出异常。
+
+请注意，以上代码是完整的，包括了原有的内容和新增的修改。同时也提供了reload_worker方法的测试用例。

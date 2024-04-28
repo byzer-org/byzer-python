@@ -1,0 +1,31 @@
+source_dir: /Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava
+target_file: /Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/output.txt 
+project_type: py
+
+model: gpt3_5_chat
+index_model: haiku_chat
+# emb_model: gpt_emb
+
+index_filter_level: 1
+index_model_max_input_length: 30000
+# index_filter_workers: 2
+# enable_rag_context: true
+
+skip_build_index: false
+execute: true
+## 代码生成的时候会每次生成一个文件，现在大模型无法一次性生成太多文件，所以需要多轮生成
+enable_multi_round_generate: false
+auto_merge: true
+human_as_model: true
+
+query: |  
+   在 UDFMaster 增加一个 reload_worker 方法，可以根据 index 指定重启某个 worker，例如 reload_worker(0) 表示重启第一个 worker。
+   为了保证重启过程不影响服务，需要先启动一个 worker,然后再把 actors 中的引用替换成新的，最后再关闭老的 worker。
+  
+   当 "modelServers" in self.conf 时，抛出错误不支持 reload_worker 方法。
+
+   没有做修改的文件不要做输出。
+   同步在 python/tests 中添加 pytest 测试用例。
+   
+   
+   

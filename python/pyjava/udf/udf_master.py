@@ -40,7 +40,7 @@ class UDFMaster(object):
     def workers(self):
         return self.actors.values()
     
-    def create_worker(self, index, conf):
+    def create_worker_conf(self, conf):
         udf_worker_conf = {}
 
         if "num_cpus" in conf:
@@ -68,6 +68,10 @@ class UDFMaster(object):
         if len(custom_resources) > 0:
             udf_worker_conf["resources"] = dict(custom_resources)
 
+        return udf_worker_conf    
+    
+    def create_worker(self, index, conf):    
+        udf_worker_conf = self.create_worker_conf(conf)        
         udf_name  = conf["UDF_CLIENT"] if "UDF_CLIENT" in conf else "UNKNOW MODEL"
         standalone = conf.get("standalone", "false") == "true"
         model_refs = []
