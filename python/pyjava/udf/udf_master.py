@@ -40,7 +40,7 @@ class UDFMaster(object):
     def workers(self):
         return self.actors.values()
     
-    def create_workers(self, conf):
+    def create_worker(self, index, conf):
         udf_worker_conf = {}
 
         if "num_cpus" in conf:
@@ -75,13 +75,14 @@ class UDFMaster(object):
             from .store import transfer_to_ob
             transfer_to_ob(udf_name, conf,model_refs)
         
+        return UDFWorker.options(**udf_worker_conf).remote(model_refs, conf, self.init_func,
+                                                           self.apply_func)
+
+    def create_workers(self, conf):
         workerMaxConcurrency = int(conf.get("workerMaxConcurrency", "1"))
         
         self.actors = dict(
-            [(index,
-              UDFWorker.options(**udf_worker_conf).remote(model_refs, conf, self.init_func,
-                                                          self.apply_func)) for index in
-             range(self.num)])
+            [(index, self.create_worker(index, conf)) for index in range(self.num)])
 
         self.load_balance = conf.get("load_balance", "lru").lower()
 
@@ -93,7 +94,6 @@ class UDFMaster(object):
         ## Round Robin 
         self.request_count = [0 for _ in range(self.num)]
         self.counter = 0
-
 
     def get(self,index = -1 ) -> List[Any]:
         '''
