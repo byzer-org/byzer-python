@@ -2,14 +2,10 @@ import uuid
 import time
 from typing import Any, NoReturn, Callable, Dict, List
 import ray
-from ray.util.client.common import ClientActorHandle, ClientObjectRef
+from ray.util.client.common import ClientObjectRef
 
-from pyjava.api.mlsql import RayContext
-from pyjava.storage import streaming_tar
 import threading
-import asyncio
 import numpy as np
-from ..utils import print_flush
 from pyjava.udf.udf_worker import UDFWorker
 
 @ray.remote
