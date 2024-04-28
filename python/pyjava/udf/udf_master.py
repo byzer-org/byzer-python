@@ -162,5 +162,7 @@ class UDFMaster(object):
             "idle_workers": idle_workers,
             "load_balance_strategy": self.load_balance,
             "total_requests": self.request_count,
-            "state": self.actor_index_concurrency
+            "state": self.actor_index_concurrency,
+            "worker_max_concurrency": self.conf.get("workerMaxConcurrency", "1"),
+            "workers_last_work_time": [f"{time.monotonic() - self.actor_index_update_time[index]}s" for index in range(self.num)],
         }
