@@ -1,0 +1,30 @@
+source_dir: /Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava
+target_file: /Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/output.txt 
+project_type: py
+
+model: gpt3_5_chat
+index_model: haiku_chat
+# emb_model: gpt_emb
+
+index_filter_level: 1
+index_model_max_input_length: 30000
+# index_filter_workers: 2
+# enable_rag_context: true
+
+skip_build_index: false
+execute: true
+## 代码生成的时候会每次生成一个文件，现在大模型无法一次性生成太多文件，所以需要多轮生成
+enable_multi_round_generate: false
+auto_merge: true
+human_as_model: true
+
+query: |  
+   在 UDFMaster 根据 create_workers 里面的逻辑，抽取出一个创建 单个worker 的 create_worker 方法。
+   你要先理解 create_workers 的逻辑，然后再抽取出 create_worker 方法。
+   
+   确保创建一个 worker 所需要的所有配置参数都放到create_worker里，比如infer_backend 等情况。
+
+   在 ./tests/test_udf_master.py 中增加一个测试用例，测试 create_worker 方法。
+   
+   
+   

@@ -95,9 +95,9 @@
     "md5": "683b7f88706079d6f89a3742c64e6119"
   },
   "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/udf/udf_master.py": {
-    "symbols": "函数：__init__, workers, create_workers, get, reset, give_back, shutdown\n类：UDFMaster\n变量：lock, num, conf, init_func, apply_func, actors, actor_indices, actor_index_concurrency, actor_index_update_time, counter, load_balance\n导入语句：import uuid,import time,from typing import Any, NoReturn, Callable, Dict, List,import ray,from ray.util.client.common import ClientObjectRef,import threading,import numpy as np,from pyjava.udf.udf_worker import UDFWorker",
-    "last_modified": 1714296489.5403085,
-    "md5": "2241ef3aa3dacf665e3d9df92f8c378f"
+    "symbols": "函数：__init__, workers, create_workers, get, reset, give_back, shutdown, stat\n类：UDFMaster\n变量：lock, num, conf, init_func, apply_func, actors, actor_indices, actor_index_concurrency, actor_index_update_time, request_count, load_balance, counter\n导入语句：import uuid,import time,from typing import Any, NoReturn, Callable, Dict, List,import ray,from ray.util.client.common import ClientObjectRef,import threading,import numpy as np,from pyjava.udf.udf_worker import UDFWorker",
+    "last_modified": 1714307923.1595,
+    "md5": "75446659857fe9dfd5450964f4e2ff2d"
   },
   "/Users/allwefantasy/Volumes/Samsung_T5/allwefantasy/CSDNWorkSpace/pyjava/python/pyjava/udf/udf_builder.py": {
     "symbols": "函数：build, _async_apply, _block_apply, async_apply, apply, init_tf\n类：UDFBuilder, UDFBuildInFunc\n变量：uuid, time, Any, NoReturn, Callable, Dict, List, ray, ClientObjectRef, RayContext, streaming_tar, UDFMaster, asyncio, stop_flag, counter, temp_udf_master, input_value, udf_master, index, worker, is_coroutine, res, model_refs, conf, model_path\n导入语句：import uuid,import time,from typing import Any, NoReturn, Callable, Dict, List,import ray,from ray.util.client.common import ClientObjectRef,from pyjava.api.mlsql import RayContext,from pyjava.storage import streaming_tar,from pyjava.udf.udf_master import UDFMaster,import asyncio,from tensorflow.keras import models",

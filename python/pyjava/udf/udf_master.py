@@ -166,3 +166,4 @@ class UDFMaster(object):
             "worker_max_concurrency": self.conf.get("workerMaxConcurrency", "1"),
             "workers_last_work_time": [f"{time.monotonic() - self.actor_index_update_time[index]}s" for index in range(self.num)],
         }
+        
