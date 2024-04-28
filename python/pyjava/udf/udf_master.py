@@ -170,4 +170,22 @@ class UDFMaster(object):
             "worker_max_concurrency": self.conf.get("workerMaxConcurrency", "1"),
             "workers_last_work_time": [f"{time.monotonic() - self.actor_index_update_time[index]}s" for index in range(self.num)],
         }
+
+    def reload_worker(self, index):
+        '''
+        重启指定序号的worker
+        '''
+        if "modelServers" in self.conf:
+            raise Exception("reload_worker is not supported when using model server")
         
+        # 先启动新的worker
+        new_worker = self.create_worker(index, self.conf)
+        ray.get(new_worker.build_model.remote())
+        
+        # 替换actors中的引用
+        old_worker = self.actors[index]
+        self.actors[index] = new_worker
+        
+        # 关闭老的worker  
+        ray.kill(old_worker)
+
