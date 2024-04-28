@@ -35,7 +35,7 @@ class UDFMaster(object):
         # [4,4,4] concurrency per actor
         self.actor_index_concurrency = []
         self.actor_index_update_time = np.array([])
-        self.request_count = 0
+        self.request_count = []
     
     def workers(self):
         return self.actors.values()
@@ -91,6 +91,7 @@ class UDFMaster(object):
         self.actor_index_update_time = np.array([time.monotonic() for _ in range(self.num)])    
 
         ## Round Robin 
+        self.request_count = [0 for _ in range(self.num)]
         self.counter = 0
 
 
@@ -99,14 +100,14 @@ class UDFMaster(object):
           get a idle UDFWorker to process inference
         '''
         if index != -1:
-            self.request_count += 1
+            self.request_count[index] += 1
             return [index, self.actors[index]]   
 
         if self.load_balance == "round_robin":
             with self.lock: 
                 index = self.counter
                 self.counter = (self.counter + 1) % self.num
-                self.request_count += 1
+                self.request_count[index]+= 1
             return [index, self.actors[index]]
 
         while sum(self.actor_index_concurrency) == 0:
@@ -120,7 +121,7 @@ class UDFMaster(object):
                 if self.actor_index_concurrency[index] > 0:
                         self.actor_index_concurrency[index] = self.actor_index_concurrency[index] - 1
                         self.actor_index_update_time[index] = time.monotonic()
-                        self.request_count += 1
+                        self.request_count[index] += 1
                         return [index, self.actors[index]]
                 else:
                     if retry > 0:
@@ -160,5 +161,6 @@ class UDFMaster(object):
             "busy_workers": busy_workers,  
             "idle_workers": idle_workers,
             "load_balance_strategy": self.load_balance,
-            "total_requests": self.request_count
+            "total_requests": self.request_count,
+            "state": self.actor_index_concurrency
         }
