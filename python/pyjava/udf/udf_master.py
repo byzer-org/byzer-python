@@ -173,19 +173,20 @@ class UDFMaster(object):
 
     def reload_worker(self, index):
         '''
-        重启指定序号的worker
+        reload a worker
         '''
         if "modelServers" in self.conf:
             raise Exception("reload_worker is not supported when using model server")
         
-        # 先启动新的worker
+        # create a new worker
         new_worker = self.create_worker(index, self.conf)
+        # load model in new worker
         ray.get(new_worker.build_model.remote())
         
-        # 替换actors中的引用
+        # replace the old worker with new worker
         old_worker = self.actors[index]
         self.actors[index] = new_worker
         
-        # 关闭老的worker  
+        # shutdown the old worker
         ray.kill(old_worker)
 
