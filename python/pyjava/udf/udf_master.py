@@ -120,14 +120,28 @@ class UDFMaster(object):
         # find a idle actor index, the idle actor index in self.actor_index_conurrency should be > 0
         with self.lock:
             retry = 3
-            while True:           
+            while True: 
+                ## find the worker who has not be visited for the longest time
                 index = np.argmin(self.actor_index_update_time)                
                 if self.actor_index_concurrency[index] > 0:
                         self.actor_index_concurrency[index] = self.actor_index_concurrency[index] - 1
                         self.actor_index_update_time[index] = time.monotonic()
                         self.request_count[index] += 1
                         return [index, self.actors[index]]
-                else:
+                else:  
+                    ## the worker maybe leak, reset the worker
+                    if time.monotonic() - self.actor_index_update_time[index] > 10*60:
+                        workerMaxConcurrency = int(self.conf.get("workerMaxConcurrency", "1"))
+                        self.actor_index_concurrency[index] = workerMaxConcurrency
+                        self.actor_index_update_time[index] = time.monotonic()
+                    ## find the worker who left the most concurrencies 
+                    index = np.argmax(self.actor_index_concurrency)
+                    if self.actor_index_concurrency[index] > 0:
+                        self.actor_index_concurrency[index] = self.actor_index_concurrency[index] - 1
+                        self.actor_index_update_time[index] = time.monotonic()
+                        self.request_count[index] += 1
+                        return [index, self.actors[index]]
+
                     if retry > 0:
                         retry = retry - 1                        
                     else:
