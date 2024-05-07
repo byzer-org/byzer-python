@@ -122,15 +122,17 @@ class UDFMaster(object):
             retry = 3
             while True: 
                 ## find the worker who has not be visited for the longest time
-                index = np.argmin(self.actor_index_update_time)                
+                index = np.argmin(self.actor_index_update_time)                                
                 if self.actor_index_concurrency[index] > 0:
                         self.actor_index_concurrency[index] = self.actor_index_concurrency[index] - 1
                         self.actor_index_update_time[index] = time.monotonic()
                         self.request_count[index] += 1
                         return [index, self.actors[index]]
                 else:  
+                    actor = self.actors[index]
+                    v = ray.get(actor.stat.remote())                    
                     ## the worker maybe leak, reset the worker
-                    if time.monotonic() - self.actor_index_update_time[index] > 10*60:
+                    if v["active_task"] == 0 or time.monotonic() - self.actor_index_update_time[index] > 10*60:
                         workerMaxConcurrency = int(self.conf.get("workerMaxConcurrency", "1"))
                         self.actor_index_concurrency[index] = workerMaxConcurrency
                         self.actor_index_update_time[index] = time.monotonic()
@@ -173,6 +175,11 @@ class UDFMaster(object):
         '''
         busy_workers = sum(1 for concurrency in self.actor_index_concurrency if concurrency < int(self.conf.get("workerMaxConcurrency", "1")))
         idle_workers = self.num - busy_workers
+
+        worker_states = []
+        for actor in self.actors.values():
+            v = ray.get(actor.stat.remote())
+            worker_states.append(v)
         
         return {
             "total_workers": self.num,
@@ -183,6 +190,7 @@ class UDFMaster(object):
             "state": self.actor_index_concurrency,
             "worker_max_concurrency": self.conf.get("workerMaxConcurrency", "1"),
             "workers_last_work_time": [f"{time.monotonic() - self.actor_index_update_time[index]}s" for index in range(self.num)],
+            "worker_state": worker_states,
         }
 
     def reload_worker(self, index):
